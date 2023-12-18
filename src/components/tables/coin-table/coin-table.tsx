@@ -7,8 +7,14 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { TableVirtuoso } from "react-virtuoso";
-import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  LinkIcon,
+} from "@heroicons/react/24/outline";
 import { Coin } from "@/types";
+import { getAbbreviatedAddress } from "@/utils";
+import Image from "next/image";
 
 export const CoinTable = ({ coins }: { coins: Coin[] }) => {
   const rerender = React.useReducer(() => ({}), {})[1];
@@ -18,24 +24,60 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
   const columns = useMemo<ColumnDef<Coin>[]>(
     () => [
       {
-        header: () => <div className="uppercase py-2 mr-4 px-4">Name</div>,
-        size: 100,
-        accessorKey: "name",
+        header: () => <div className="uppercase py-2 mr-4 px-4"></div>,
+        size: 8,
+        accessorKey: "imageUrl",
         cell: (info) => (
-          <div className="flex flex-col text-left px-4 overflow-hidden">
+          <Image
+            className="h-8 w-8 ml-4"
+            width={24}
+            height={24}
+            src={info.getValue() as string}
+            alt={info.getValue() as string}
+          />
+        ),
+      },
+      {
+        header: () => <div className="uppercase py-2 mr-4 px-4">Symbol</div>,
+        size: 25,
+        accessorKey: "symbol",
+        cell: (info) => (
+          <div className="flex flex-col px-4">
             <div className="truncate">{`$${info.getValue()}`}</div>
           </div>
         ),
       },
       {
-        header: () => (
-          <div className="uppercase py-2 mr-4 px-4">24h Change %</div>
-        ),
+        header: () => <div className="uppercase py-2 mr-4 px-4">Name</div>,
         size: 50,
+        accessorKey: "name",
+        cell: (info) => (
+          <div className="flex flex-col px-4">
+            <div className="truncate">{`${info.getValue()}`}</div>
+          </div>
+        ),
+      },
+      {
+        header: () => (
+          <div className="uppercase py-2 mr-4 px-4">Market Cap</div>
+        ),
+        size: 40,
+        accessorKey: "marketCap",
+        cell: (info) => (
+          <div className="flex flex-col px-4">
+            <div>{`$${Number(info.getValue()).toFixed(2)}`}</div>
+          </div>
+        ),
+      },
+      {
+        header: () => (
+          <div className="uppercase py-2 mr-4 px-4">24h Change</div>
+        ),
+        size: 30,
         accessorKey: "v24hrChangePercent",
         cell: (info) => (
-          <div className="flex flex-col text-left px-4 overflow-hidden">
-            <div>{`$${Number(info.getValue()).toFixed(2)}`}</div>
+          <div className="flex flex-col px-4">
+            <div>{`${Number(info.getValue()).toFixed(2)}%`}</div>
           </div>
         ),
       },
@@ -44,28 +86,37 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         size: 50,
         accessorKey: "v24hrUSD",
         cell: (info) => (
-          <div className="flex flex-col text-left px-4 overflow-hidden">
+          <div className="flex flex-col px-4">
             <div>{`$${Number(info.getValue()).toFixed(2)}`}</div>
           </div>
         ),
       },
       {
-        header: () => <div className="uppercase px-4 pl-24">Address</div>,
+        header: () => <div className="uppercase px-4">Address</div>,
         id: "address",
+        size: 30,
         accessorKey: "address",
         cell: (info: any) => (
-          <div className="flex flex-col text-left px-4 pl-24">
-            <div>{`${info.getValue()}`}</div>
+          <div className="flex flex-col px-4">
+            <div>{getAbbreviatedAddress(info.getValue())}</div>
           </div>
         ),
       },
       {
-        header: () => <div className="uppercase px-4 pl-24">Links</div>,
+        header: () => <div className="uppercase px-4"></div>,
         id: "links",
+        accessorKey: "address",
+
         size: 30,
         cell: (info: any) => (
-          <div className="flex flex-col text-left px-4 pl-24">
-            <div>{`${info.getValue()}`}</div>
+          <div className="flex flex-col px-4">
+            <a
+              href={`https://birdeye.so/token/${info.getValue()}?chain=solana`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <LinkIcon className="h-4 w-4" />
+            </a>
           </div>
         ),
       },
@@ -137,6 +188,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
                 return (
                   <th
                     key={header.id}
+                    className="text-xs"
                     colSpan={header.colSpan}
                     style={{
                       width: header.getSize(),
