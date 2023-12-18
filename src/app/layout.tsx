@@ -7,8 +7,8 @@ import classNames from "classnames";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "aurora vertex",
-  description: "aurora vertex",
+  title: "AURORA VERTEX",
+  description: "AURORA VERTEX",
 };
 
 export default function RootLayout({

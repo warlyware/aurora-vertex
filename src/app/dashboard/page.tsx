@@ -1,9 +1,9 @@
 "use client";
 
 import { nhost } from "@/client";
+import { PageWrapper } from "@/components/UI/page-wrapper";
 import { Header } from "@/components/UI/header";
 import { Logo } from "@/components/UI/logo";
-import Spinner from "@/components/UI/spinner";
 import { CoinTable } from "@/components/tables/coin-table/coin-table";
 import { BASE_URL } from "@/constants";
 import { GET_COINS } from "@/graphql/queries/get-coins";
@@ -48,7 +48,7 @@ export default function Dashboard() {
   return (
     <>
       {!!user?.id && <Header />}
-      <div className="flex flex-col items-center justify-center h-full w-full justify-items-center min-h-screen px-6 -mt-16">
+      <PageWrapper>
         {!!user?.id ? (
           <CoinTable coins={coins} />
         ) : (
@@ -56,7 +56,7 @@ export default function Dashboard() {
             <Logo />
           </Link>
         )}
-      </div>
+      </PageWrapper>
     </>
   );
 }
