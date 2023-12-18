@@ -1,5 +1,4 @@
 "use client";
-
 import { nhost } from "@/client";
 import { PageWrapper } from "@/components/UI/page-wrapper";
 import { Header } from "@/components/UI/header";
@@ -53,7 +52,9 @@ export default function Dashboard() {
           <CoinTable coins={coins} />
         ) : (
           <Link href="/login">
-            <Logo />
+            <div className="mt-16">
+              <Logo />
+            </div>
           </Link>
         )}
       </PageWrapper>

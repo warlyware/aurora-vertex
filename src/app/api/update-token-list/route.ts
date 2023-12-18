@@ -3,7 +3,6 @@ import { client } from "@/client/backend-client";
 import { BASE_URL } from "@/constants";
 import { ADD_COINS } from "@/graphql/mutations/add-coins";
 import { UPDATE_COIN_BY_ADDRESS } from "@/graphql/mutations/update-coin-by-address";
-import { UPDATE_COINS } from "@/graphql/mutations/update-coins";
 import { GET_COINS } from "@/graphql/queries/get-coins";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
@@ -27,8 +26,6 @@ export async function POST(req: NextRequest) {
       limit: 50,
     }
   );
-
-  console.log({ data, coins: data?.coins });
 
   let coins = data?.coins.map((coin) => {
     return {

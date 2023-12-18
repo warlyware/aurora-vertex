@@ -22,21 +22,22 @@ export async function POST(req: NextRequest) {
   }
 
   const birdeyeResponse = await fetch(
-    `https://public-api.birdeye.so/v1/wallet/token_list?wallet=${address}&x-chain=solana`,
+    `https://public-api.birdeye.so/v1/wallet/token_list?wallet=${address}`,
     {
       headers: {
         "X-API-KEY": `${process.env.BIRDEYE_API_KEY}`,
+        "x-chain": "ethereum", // is bug, actually is solana
       },
     }
   );
 
-  const { data }: { data: any } = await birdeyeResponse.json();
+  const { data } = await birdeyeResponse.json();
 
   console.log({ data });
 
   return NextResponse.json({
     status: 200,
     ...data,
-    coins: data?.tokens,
+    coins: data?.items,
   });
 }
