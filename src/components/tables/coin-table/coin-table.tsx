@@ -19,6 +19,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
     () => [
       {
         header: () => <div className="uppercase py-2 mr-4 px-4">Name</div>,
+        size: 100,
         accessorKey: "name",
         cell: (info) => (
           <div className="flex flex-col text-left px-4 overflow-hidden">
@@ -28,10 +29,40 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
       },
       {
         header: () => (
-          <div className="uppercase px-4 pl-24 bg-black ">Address</div>
+          <div className="uppercase py-2 mr-4 px-4">24h Change %</div>
         ),
+        size: 50,
+        accessorKey: "v24hrChangePercent",
+        cell: (info) => (
+          <div className="flex flex-col text-left px-4 overflow-hidden">
+            <div>{`$${Number(info.getValue()).toFixed(2)}`}</div>
+          </div>
+        ),
+      },
+      {
+        header: () => <div className="uppercase py-2 mr-4 px-4">24h Price</div>,
+        size: 50,
+        accessorKey: "v24hrUSD",
+        cell: (info) => (
+          <div className="flex flex-col text-left px-4 overflow-hidden">
+            <div>{`$${Number(info.getValue()).toFixed(2)}`}</div>
+          </div>
+        ),
+      },
+      {
+        header: () => <div className="uppercase px-4 pl-24">Address</div>,
         id: "address",
         accessorKey: "address",
+        cell: (info: any) => (
+          <div className="flex flex-col text-left px-4 pl-24">
+            <div>{`${info.getValue()}`}</div>
+          </div>
+        ),
+      },
+      {
+        header: () => <div className="uppercase px-4 pl-24">Links</div>,
+        id: "links",
+        size: 30,
         cell: (info: any) => (
           <div className="flex flex-col text-left px-4 pl-24">
             <div>{`${info.getValue()}`}</div>
@@ -67,7 +98,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
       <div style={{ height: "0.5rem" }} />
 
       <TableVirtuoso
-        style={{ height: "500px", border: "1px solid lightgray" }}
+        style={{ height: "85vh", border: "1px solid lightgray" }}
         totalCount={rows.length}
         components={{
           Table: ({ style, ...props }) => {
@@ -101,7 +132,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         }}
         fixedHeaderContent={() => {
           return table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="bg-black">
+            <tr key={headerGroup.id} className="bg-blue-700">
               {headerGroup.headers.map((header) => {
                 return (
                   <th
