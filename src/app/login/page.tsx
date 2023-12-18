@@ -2,11 +2,7 @@
 
 import { PrimaryButton } from "@/components/UI/buttons/primary-button";
 import { FormInputWithLabel } from "@/components/UI/forms/form-input-with-label";
-import {
-  useAuthenticationStatus,
-  useSignInEmailPassword,
-  useSignUpEmailPassword,
-} from "@nhost/nextjs";
+import { useAuthenticationStatus, useSignInEmailPassword } from "@nhost/nextjs";
 import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 
@@ -51,7 +47,7 @@ export default function Login() {
     <div className="flex flex-col items-center justify-center h-full w-full justify-items-center min-h-screen">
       <form onSubmit={formik.handleSubmit}>
         <FormInputWithLabel
-          label="Email"
+          label="Username"
           name="username"
           value={formik.values.username}
           onChange={formik.handleChange}
