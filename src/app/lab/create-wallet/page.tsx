@@ -1,5 +1,6 @@
 "use client";
 import { PrimaryButton } from "@/components/UI/buttons/primary-button";
+import CenterContentWrapper from "@/components/UI/center-content-wrapper";
 import { PageWrapper } from "@/components/UI/page-wrapper";
 import { BASE_URL } from "@/constants";
 import axios from "axios";
@@ -16,11 +17,13 @@ export default function CreateWallet() {
   };
   return (
     <PageWrapper>
-      <div className="flex flex-col h-full w-full min-h-screen justify-center items-center">
-        <PrimaryButton onClick={handleCreateWallet}>
-          Create Wallet
-        </PrimaryButton>
-      </div>
+      <CenterContentWrapper>
+        <div className="flex flex-col h-full w-full min-h-screen justify-center items-center">
+          <PrimaryButton onClick={handleCreateWallet}>
+            Create Wallet
+          </PrimaryButton>
+        </div>
+      </CenterContentWrapper>
     </PageWrapper>
   );
 }

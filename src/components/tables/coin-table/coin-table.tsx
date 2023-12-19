@@ -15,6 +15,7 @@ import {
 import { Coin } from "@/types";
 import { getAbbreviatedAddress } from "@/utils";
 import Image from "next/image";
+import Link from "next/link";
 
 export const CoinTable = ({ coins }: { coins: Coin[] }) => {
   const rerender = React.useReducer(() => ({}), {})[1];
@@ -191,11 +192,18 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
             const index = props["data-index"];
             const row = rows[index];
 
+            const address = row.getVisibleCells()[6].getValue();
+
             return (
               <tr {...props}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} style={{ padding: "6px" }}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <Link href={`/coin/${address}`}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </Link>
                   </td>
                 ))}
               </tr>
