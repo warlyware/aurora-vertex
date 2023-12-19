@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     {
       headers: {
         "X-API-KEY": `${process.env.BIRDEYE_API_KEY}`,
-        "x-chain": "ethereum", // is bug, actually is solana
+        "x-chain": "ethereum", // is bug, actually gets solana
       },
     }
   );

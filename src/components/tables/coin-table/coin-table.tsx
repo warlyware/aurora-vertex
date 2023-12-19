@@ -20,6 +20,22 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
   const rerender = React.useReducer(() => ({}), {})[1];
 
   const [sorting, setSorting] = React.useState([]);
+  const [formattedCoins, setFormattedCoins] = useState<Coin[]>([]);
+
+  useEffect(() => {
+    if (coins.length > 0) {
+      setFormattedCoins(
+        coins
+          .map((coin) => {
+            return {
+              ...coin,
+              symbol: (coin.symbol.startsWith("$") ? "" : "$") + coin.symbol,
+            };
+          })
+          .filter((coin) => coin.name?.length)
+      );
+    }
+  }, [coins]);
 
   const columns = useMemo<ColumnDef<Coin>[]>(
     () => [
@@ -28,13 +44,17 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         size: 8,
         accessorKey: "imageUrl",
         cell: (info) => (
-          <Image
-            className="h-8 w-8 ml-4"
-            width={24}
-            height={24}
-            src={info.getValue() as string}
-            alt={info.getValue() as string}
-          />
+          <>
+            {!!info?.getValue() && (
+              <Image
+                className="h-8 w-8 ml-4"
+                width={24}
+                height={24}
+                src={info?.getValue() as string}
+                alt={info?.getValue() as string}
+              />
+            )}
+          </>
         ),
       },
       {
@@ -43,7 +63,8 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         accessorKey: "symbol",
         cell: (info) => (
           <div className="flex flex-col px-4">
-            <div className="truncate">{`$${info.getValue()}`}</div>
+            {/* prepend $ only if none exist */}
+            <div className="truncate">{`${info.getValue()}`}</div>
           </div>
         ),
       },
@@ -53,7 +74,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         accessorKey: "name",
         cell: (info) => (
           <div className="flex flex-col px-4">
-            <div className="truncate">{`${info.getValue()}`}</div>
+            <div className="truncate">{`${info?.getValue()}`}</div>
           </div>
         ),
       },
@@ -65,7 +86,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         accessorKey: "marketCap",
         cell: (info) => (
           <div className="flex flex-col px-4">
-            <div>{`$${Number(info.getValue()).toFixed(2)}`}</div>
+            <div>{`$${Number(info?.getValue()).toFixed(2)}`}</div>
           </div>
         ),
       },
@@ -77,7 +98,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         accessorKey: "v24hrChangePercent",
         cell: (info) => (
           <div className="flex flex-col px-4">
-            <div>{`${Number(info.getValue()).toFixed(2)}%`}</div>
+            <div>{`${Number(info?.getValue()).toFixed(2)}%`}</div>
           </div>
         ),
       },
@@ -87,7 +108,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         accessorKey: "v24hrUSD",
         cell: (info) => (
           <div className="flex flex-col px-4">
-            <div>{`$${Number(info.getValue()).toFixed(2)}`}</div>
+            <div>{`$${Number(info?.getValue()).toFixed(2)}`}</div>
           </div>
         ),
       },
@@ -98,7 +119,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         accessorKey: "address",
         cell: (info: any) => (
           <div className="flex flex-col px-4">
-            <div>{getAbbreviatedAddress(info.getValue())}</div>
+            <div>{getAbbreviatedAddress(info?.getValue())}</div>
           </div>
         ),
       },
@@ -111,7 +132,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         cell: (info: any) => (
           <div className="flex flex-col px-4">
             <a
-              href={`https://birdeye.so/token/${info.getValue()}?chain=solana`}
+              href={`https://birdeye.so/token/${info?.getValue()}?chain=solana`}
               target="_blank"
               rel="noreferrer"
             >
@@ -125,7 +146,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
   );
 
   useEffect(() => {
-    setData(coins);
+    setData(formattedCoins);
   }, [coins]);
 
   const [data, setData] = useState(coins);

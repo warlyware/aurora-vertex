@@ -1,5 +1,4 @@
 "use client";
-import { nhost } from "@/client";
 import { Header } from "@/components/UI/header";
 import { Logo } from "@/components/UI/logo";
 import { PageWrapper } from "@/components/UI/page-wrapper";
@@ -7,7 +6,8 @@ import { BASE_URL } from "@/constants";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 interface Portfolio {
   id: string;
@@ -16,25 +16,57 @@ interface Portfolio {
   totalUsd: number;
 }
 
-export default function Wallets() {
+export default function TraderDetailPage() {
   const user = useUserData();
+  const params = useParams();
+
+  const [hasFetched, setHasFetched] = useState(false);
+  const [hasBeenAdded, setHasBeenAdded] = useState(false);
+  const [isBeingAdded, setIsBeingAdded] = useState(false);
+
+  const address = params.address as string;
 
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
 
-  const fetchWalletPortfolios = async () => {
+  const fetchWalletPortfolios = useCallback(async () => {
     const { data } = await axios.post(
       `${BASE_URL}/api/get-wallet-portfolio-from-birdeye`,
       {
-        address: "DPdvWV3jZkKQgH8c93CdMghaihiPpDgEX4RVmRLDF6Tg",
+        address,
       }
     );
     console.log({ data });
     setPortfolio(data);
-  };
+    setHasFetched(true);
+  }, [address]);
+
+  const handleAddTrader = useCallback(async () => {
+    setIsBeingAdded(true);
+    const { data } = await axios.post(`${BASE_URL}/api/add-trader`, {
+      address,
+    });
+
+    setPortfolio(data);
+    setHasBeenAdded(true);
+    setIsBeingAdded(false);
+  }, [address]);
 
   useEffect(() => {
-    fetchWalletPortfolios();
-  }, []);
+    // if (!portfolio && !hasFetched) {
+    //   fetchWalletPortfolios();
+    // }
+
+    if (!hasBeenAdded && !isBeingAdded) {
+      handleAddTrader();
+    }
+  }, [
+    address,
+    fetchWalletPortfolios,
+    hasBeenAdded,
+    handleAddTrader,
+    portfolio,
+    isBeingAdded,
+  ]);
 
   return (
     <>
