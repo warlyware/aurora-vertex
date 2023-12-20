@@ -1,14 +1,25 @@
 import { BASE_URL } from "@/constants";
 import { GET_WALLETS_BY_USER_ID } from "@/graphql/queries/get-wallets-by-user-id";
+import { usePrevious } from "@/hooks/use-previous";
 import { Wallet } from "@/types";
 import { getAbbreviatedAddress } from "@/utils";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
-import React, { ReactNode, useContext, useState } from "react";
+import React, {
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import isEqual from "lodash.isequal";
+
+type WalletTokenBalance = unknown;
 
 type EnhancedWallet = Wallet & {
   shortAddress: string | null;
+  balances: WalletTokenBalance[];
 };
 
 type AuroraContextType = {
@@ -37,25 +48,36 @@ export const AuroraProvider = ({ children }: { children: ReactNode }) => {
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
   const [isLoadingWallets, setIsLoadingWallets] = useState(false);
   const [isLoadingActiveWallet, setIsLoadingActiveWallet] = useState(false);
+  const [isUpdatedWalletsBalances, setIsUpdatedWalletsBalances] =
+    useState(false);
+  const prevUserWallets = usePrevious(userWallets);
+  const [shouldUpdateBalances, setShouldUpdateBalances] = useState(false);
+
   const user = useUserData();
+
+  const createEnhancedWallet = (wallet: Wallet): EnhancedWallet => {
+    return {
+      ...wallet,
+      shortAddress: getAbbreviatedAddress(wallet.address),
+      balances: [],
+    };
+  };
 
   const { loading } = useQuery(GET_WALLETS_BY_USER_ID, {
     variables: {
       userId: user?.id,
     },
     skip: !user?.id,
-    onCompleted: ({ wallets }: { wallets: Wallet[] }) => {
-      setUserWallets(wallets.map(createEnhancedWallet));
+    onCompleted: (data) => {
+      const enhancedWallets = data.wallets.map(createEnhancedWallet);
+      setUserWallets(enhancedWallets);
+      setIsLoadingWallets(false);
+    },
+    onError: (error) => {
+      console.error("Error loading wallets", error);
       setIsLoadingWallets(false);
     },
   });
-
-  const createEnhancedWallet = (wallet: Wallet): EnhancedWallet => {
-    return {
-      ...wallet,
-      shortAddress: getAbbreviatedAddress(wallet.address),
-    };
-  };
 
   const handleSetActiveWallet = async (
     wallet: EnhancedWallet | Wallet | null
@@ -95,6 +117,51 @@ export const AuroraProvider = ({ children }: { children: ReactNode }) => {
     setUserWallets((wallets) => [...wallets, createEnhancedWallet(wallet)]);
     setIsCreatingWallet(false);
   };
+
+  const fetchWalletBalances = async (activeWallet?: EnhancedWallet) => {
+    if (!activeWallet) return;
+
+    const { data } = await axios.post(`${BASE_URL}/api/get-wallet-balances`, {
+      address: activeWallet.address,
+    });
+
+    const { balances } = data;
+
+    return balances;
+  };
+
+  const updateWalletBalances = useCallback(async () => {
+    if (!user || !userWallets.length) return;
+
+    let isUpdated = false;
+    const updatedWallets = await Promise.all(
+      userWallets.map(async (wallet) => {
+        const balances = await fetchWalletBalances(wallet);
+        if (isEqual(wallet.balances, balances)) {
+          isUpdated = true;
+          return { ...wallet, balances };
+        }
+        return wallet;
+      })
+    );
+
+    if (isUpdated) {
+      setUserWallets(updatedWallets);
+    }
+  }, [user, userWallets]);
+
+  useEffect(() => {
+    const activeWallet = userWallets.find((wallet) => wallet.isActiveWallet);
+    if (!activeWallet) return;
+    if (isUpdatedWalletsBalances) return;
+    updateWalletBalances();
+  }, [userWallets, isUpdatedWalletsBalances, updateWalletBalances]);
+
+  useEffect(() => {
+    if (!isEqual(prevUserWallets, userWallets)) {
+      updateWalletBalances();
+    }
+  }, [userWallets, prevUserWallets, updateWalletBalances]);
 
   return (
     <Provider
