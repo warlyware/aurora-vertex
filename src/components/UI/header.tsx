@@ -16,8 +16,17 @@ export const Header = () => {
         <Link href="/wallet">wallets</Link>
         <div className="flex-1"></div>
         <div className="flex">
-          <div className="mr-2">active wallet:</div>
-          {isLoadingActiveWallet ? <Spinner /> : activeWallet?.shortAddress}
+          {isLoadingActiveWallet ? (
+            <Spinner height={20} width={20} />
+          ) : (
+            <div className="flex space-x-4">
+              <div>{activeWallet?.shortAddress}</div>
+              <div className="flex">
+                <div className="mr-2">{activeWallet?.balances?.sol}</div>
+                <div>sol</div>
+              </div>
+            </div>
+          )}
         </div>
         {!!user?.id && (
           <button onClick={signOut} className="uppercase">

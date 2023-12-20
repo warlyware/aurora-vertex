@@ -6,9 +6,15 @@ import { PageWrapper } from "@/components/UI/page-wrapper";
 import Spinner from "@/components/UI/spinner";
 import { Unauthorized } from "@/components/UI/unauthorized";
 import { useAurora } from "@/hooks";
+import {
+  ArrowRightCircleIcon,
+  ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
 
 import classNames from "classnames";
+import Link from "next/link";
+import { useEffect } from "react";
 
 export default function CreateWallet() {
   const user = useUserData();
@@ -20,6 +26,8 @@ export default function CreateWallet() {
     isLoadingActiveWallet,
     isLoadingWallets,
   } = useAurora();
+
+  useEffect(() => {}, [user]);
 
   if (!user?.id) return <Unauthorized />;
 
@@ -36,26 +44,32 @@ export default function CreateWallet() {
       {user?.id && <Header />}
       <PageWrapper>
         <div className="mt-16">
-          <div className="text-2xl text-center">my wallets</div>
-          <div className="h-16 flex justify-center py-4">
-            {isLoadingActiveWallet && <Spinner />}
-          </div>
+          <div className="text-2xl text-center mb-8">my wallets</div>
+
           <>
             {!!userWallets?.length && (
               <div>
                 {userWallets.map((wallet) => (
-                  <button
+                  <div
                     key={wallet.id}
-                    onClick={() => setActiveWallet(wallet)}
                     className={classNames([
-                      "flex flex-row mb-4 border  p-4 rounded-md",
+                      "flex items-center justify-between mb-4 border rounded-md cursor-pointer p-4",
                       wallet.isActiveWallet
                         ? "border-green-500"
                         : "border-blue-700",
                     ])}
                   >
-                    <div className="mr-4">{wallet.address}</div>
-                  </button>
+                    <div onClick={() => setActiveWallet(wallet)}>
+                      {wallet.address}
+                    </div>
+                    <Link href={`/wallet/${wallet.id}`} className="ml-4">
+                      <ArrowRightCircleIcon
+                        className="w-6 h-6"
+                        height={32}
+                        width={32}
+                      />
+                    </Link>
+                  </div>
                 ))}
               </div>
             )}

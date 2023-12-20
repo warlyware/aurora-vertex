@@ -14,12 +14,14 @@ import React, {
   useState,
 } from "react";
 import isEqual from "lodash.isequal";
-
-type WalletTokenBalance = unknown;
+import { TokenBalance } from "@/app/api/get-wallet-balances/route";
 
 type EnhancedWallet = Wallet & {
   shortAddress: string | null;
-  balances: WalletTokenBalance[];
+  balances: {
+    splTokens: TokenBalance[];
+    sol: number;
+  };
 };
 
 type AuroraContextType = {
@@ -48,10 +50,7 @@ export const AuroraProvider = ({ children }: { children: ReactNode }) => {
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
   const [isLoadingWallets, setIsLoadingWallets] = useState(false);
   const [isLoadingActiveWallet, setIsLoadingActiveWallet] = useState(false);
-  const [isUpdatedWalletsBalances, setIsUpdatedWalletsBalances] =
-    useState(false);
   const prevUserWallets = usePrevious(userWallets);
-  const [shouldUpdateBalances, setShouldUpdateBalances] = useState(false);
 
   const user = useUserData();
 
@@ -59,7 +58,10 @@ export const AuroraProvider = ({ children }: { children: ReactNode }) => {
     return {
       ...wallet,
       shortAddress: getAbbreviatedAddress(wallet.address),
-      balances: [],
+      balances: {
+        splTokens: [],
+        sol: 0,
+      },
     };
   };
 
@@ -130,7 +132,7 @@ export const AuroraProvider = ({ children }: { children: ReactNode }) => {
     return balances;
   };
 
-  const updateWalletBalances = useCallback(async () => {
+  const updateAllWalletBalances = useCallback(async () => {
     if (!user || !userWallets.length) return;
 
     let isUpdated = false;
@@ -150,18 +152,27 @@ export const AuroraProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, userWallets]);
 
+  const updateActiveWalletBalances = useCallback(async () => {
+    if (!user || !userWallets.length) return;
+
+    const activeWallet = userWallets.find((wallet) => wallet.isActiveWallet);
+    if (!activeWallet) return;
+
+    const balances = await fetchWalletBalances(activeWallet);
+    if (!isEqual(activeWallet.balances, balances)) {
+      setUserWallets((wallets) =>
+        wallets.map((wallet) =>
+          wallet.id === activeWallet.id ? { ...wallet, balances } : wallet
+        )
+      );
+    }
+  }, [user, userWallets]);
+
   useEffect(() => {
     const activeWallet = userWallets.find((wallet) => wallet.isActiveWallet);
     if (!activeWallet) return;
-    if (isUpdatedWalletsBalances) return;
-    updateWalletBalances();
-  }, [userWallets, isUpdatedWalletsBalances, updateWalletBalances]);
-
-  useEffect(() => {
-    if (!isEqual(prevUserWallets, userWallets)) {
-      updateWalletBalances();
-    }
-  }, [userWallets, prevUserWallets, updateWalletBalances]);
+    updateActiveWalletBalances();
+  }, [userWallets, updateActiveWalletBalances]);
 
   return (
     <Provider
