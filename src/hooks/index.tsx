@@ -1,8 +1,8 @@
 import { BASE_URL } from "@/constants";
 import { GET_WALLETS_BY_USER_ID } from "@/graphql/queries/get-wallets-by-user-id";
 import { usePrevious } from "@/hooks/use-previous";
-import { Wallet } from "@/types";
-import { getAbbreviatedAddress } from "@/utils";
+import { EnhancedWallet, Wallet } from "@/types";
+import { createEnhancedWallet, getAbbreviatedAddress } from "@/utils";
 import { useQuery } from "@apollo/client";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
@@ -14,15 +14,7 @@ import React, {
   useState,
 } from "react";
 import isEqual from "lodash.isequal";
-import { TokenBalance } from "@/app/api/get-wallet-balances/route";
-
-type EnhancedWallet = Wallet & {
-  shortAddress: string | null;
-  balances: {
-    splTokens: TokenBalance[];
-    sol: number;
-  };
-};
+import showToast from "@/utils/show-toast";
 
 type AuroraContextType = {
   activeWallet: EnhancedWallet | null;
@@ -53,17 +45,6 @@ export const AuroraProvider = ({ children }: { children: ReactNode }) => {
   const prevUserWallets = usePrevious(userWallets);
 
   const user = useUserData();
-
-  const createEnhancedWallet = (wallet: Wallet): EnhancedWallet => {
-    return {
-      ...wallet,
-      shortAddress: getAbbreviatedAddress(wallet.address),
-      balances: {
-        splTokens: [],
-        sol: 0,
-      },
-    };
-  };
 
   const { loading } = useQuery(GET_WALLETS_BY_USER_ID, {
     variables: {
@@ -118,6 +99,9 @@ export const AuroraProvider = ({ children }: { children: ReactNode }) => {
 
     setUserWallets((wallets) => [...wallets, createEnhancedWallet(wallet)]);
     setIsCreatingWallet(false);
+    showToast({
+      primaryMessage: "Wallet created!",
+    });
   };
 
   const fetchWalletBalances = async (activeWallet?: EnhancedWallet) => {

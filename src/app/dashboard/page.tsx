@@ -11,6 +11,7 @@ import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import showToast from "@/utils/show-toast";
 
 export default function Dashboard() {
   const [coins, setCoins] = useState([]);
@@ -29,7 +30,6 @@ export default function Dashboard() {
         console.error(error);
       }
       setCoins(data?.coins);
-      console.log(data);
     }
     getCoins();
   }, []);
@@ -49,7 +49,9 @@ export default function Dashboard() {
       {!!user?.id && <Header />}
       <PageWrapper>
         {!!user?.id ? (
-          <CoinTable coins={coins} />
+          <div className="w-full -mt-12">
+            <CoinTable coins={coins} />
+          </div>
         ) : (
           <Link href="/login">
             <div className="mt-16">

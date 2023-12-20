@@ -51,6 +51,7 @@
     "pino-pretty": "^10.3.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-hot-toast": "^2.4.1",
     "react-virtuoso": "^4.6.2",
     "ws": "^8.15.1"
   },

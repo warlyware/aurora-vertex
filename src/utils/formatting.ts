@@ -1,10 +1,7 @@
 export const addCommasToNumber = (value: number | string) => {
   if (typeof value === "string" && !isNaN(parseFloat(value))) {
     value = parseFloat(value);
-  } else {
-    return value;
   }
-
   return value.toLocaleString("en-US");
 };
 

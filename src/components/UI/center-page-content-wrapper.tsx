@@ -6,6 +6,6 @@ export default function CenterPageContentWrapper({
   children: React.ReactNode;
 }) {
   return (
-    <CenterContentWrapper className="-mt-16">{children}</CenterContentWrapper>
+    <CenterContentWrapper className="-mt-32">{children}</CenterContentWrapper>
   );
 }

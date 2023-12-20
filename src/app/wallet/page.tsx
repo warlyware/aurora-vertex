@@ -43,7 +43,7 @@ export default function CreateWallet() {
     <>
       {user?.id && <Header />}
       <PageWrapper>
-        <div className="mt-16">
+        <>
           <div className="text-2xl text-center mb-8">my wallets</div>
 
           <>
@@ -80,7 +80,7 @@ export default function CreateWallet() {
               Create Wallet
             </PrimaryButton>
           </div>
-        </div>
+        </>
       </PageWrapper>
     </>
   );

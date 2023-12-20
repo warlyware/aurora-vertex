@@ -1,6 +1,7 @@
 import { isPublicKey } from "@metaplex-foundation/umi";
 import axios from "axios";
 import { SolscanTokenHoldersResponse } from "@/types/solscan";
+import { EnhancedWallet, Wallet } from "@/types";
 
 export type TokenHoldersList = {
   total: number;
@@ -59,4 +60,15 @@ export const getTokenHolderCount = async (
 ): Promise<number> => {
   const { total } = await getTokenHolders(mintAddress);
   return total;
+};
+
+export const createEnhancedWallet = (wallet: Wallet): EnhancedWallet => {
+  return {
+    ...wallet,
+    shortAddress: getAbbreviatedAddress(wallet.address),
+    balances: {
+      splTokens: [],
+      sol: 0,
+    },
+  };
 };

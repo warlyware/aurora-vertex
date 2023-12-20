@@ -2,6 +2,7 @@
 import { GetTokenInfoFromDasResponse } from "@/app/api/get-token-info-from-das/route";
 import { GetTokenInfoFromDexscreenerResponse } from "@/app/api/get-token-info-from-dexscreener/route";
 import { GetTokenInfoFromHeliusResponse } from "@/app/api/get-token-info-from-helius/route";
+import { CopyToClipboardButton } from "@/components/UI/buttons/copy-to-clipboard-button";
 import CenterPageContentWrapper from "@/components/UI/center-page-content-wrapper";
 import { Header } from "@/components/UI/header";
 import { PageWrapper } from "@/components/UI/page-wrapper";
@@ -11,7 +12,6 @@ import { BASE_URL } from "@/constants";
 import { HolderFromSolscan } from "@/types/solscan";
 import { getAbbreviatedAddress } from "@/utils";
 import { addCommasToNumber, truncateDescription } from "@/utils/formatting";
-import { CheckCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 import Image from "next/image";
@@ -29,7 +29,6 @@ export default function CoinDetailPage({ params }: { params: any }) {
   const { address } = params;
   const [coin, setCoin] = useState<CoinInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [addressCopied, setAddressCopied] = useState(false);
 
   const fetchCoin = useCallback(async () => {
     const { data } = await axios.post(`${BASE_URL}/api/get-token-info`, {
@@ -43,14 +42,6 @@ export default function CoinDetailPage({ params }: { params: any }) {
   useEffect(() => {
     fetchCoin();
   }, [address, fetchCoin]);
-
-  const handleCopyToClipboard = useCallback(() => {
-    navigator.clipboard.writeText(coin?.address || "");
-    setAddressCopied(true);
-    setTimeout(() => {
-      setAddressCopied(false);
-    }, 1000);
-  }, [coin]);
 
   if (isLoading) {
     return (
@@ -67,7 +58,7 @@ export default function CoinDetailPage({ params }: { params: any }) {
       {!!user?.id && <Header />}
       <PageWrapper>
         {!!coin && (
-          <div className="flex w-full h-screen max-w-5xl -mt-16">
+          <div className="flex w-full h-full max-w-5xl">
             <div className="w-1/2 h-full flex flex-col justify-center items-center px-4">
               <Image
                 src={coin.imageUrl}
@@ -76,37 +67,24 @@ export default function CoinDetailPage({ params }: { params: any }) {
                 height={200}
                 className="rounded-full block"
               />
-              <div className="text-4xl my-4">
-                {coin.symbol.startsWith("$") ? coin.symbol : `$${coin.symbol}`}
-              </div>
+              {!!coin?.symbol && (
+                <div className="text-4xl my-4">
+                  {coin.symbol.startsWith("$")
+                    ? coin.symbol
+                    : `$${coin.symbol}`}
+                </div>
+              )}
               <div className="mb-4">{coin.name}</div>
               <div className="mb-4 flex items-center space-x-2">
                 <div>{getAbbreviatedAddress(coin.address)}</div>
-                <button
-                  onClick={handleCopyToClipboard}
-                  className="flex items-center"
-                >
-                  {addressCopied ? (
-                    <CheckCircleIcon
-                      className="inline-block w-4 h-4 text-green-500"
-                      height={16}
-                      width={16}
-                    />
-                  ) : (
-                    <ClipboardIcon
-                      className="inline-block w-4 h-4"
-                      height={16}
-                      width={16}
-                    />
-                  )}
-                </button>
+                <CopyToClipboardButton text={address} />
               </div>
               <div className="mb-4 italic max-w-sm">
                 {truncateDescription(coin.description)}
               </div>
             </div>
             <div className="w-1/2 h-full flex flex-col justify-center px-4">
-              <div className="mb-4">
+              <div className="mb-4 pt-16">
                 Holders: {addCommasToNumber(coin.holderCount)}
               </div>
               {!!coin.totalSupply && (

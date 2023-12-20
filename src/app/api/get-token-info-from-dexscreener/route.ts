@@ -35,38 +35,47 @@ export async function POST(req: NextRequest) {
     method: "GET",
   });
 
-  const data: DexscreenerCoinInfoResponse = await res.json();
+  let data: DexscreenerCoinInfoResponse;
 
-  console.log({ data });
+  try {
+    data = await res.json();
+    console.log({ data });
 
-  const { ds, cg, ti } = data;
+    const { ds, cg, ti } = data;
 
-  const socials = ds?.socials || cg?.social || ti?.socials;
-  const description = ds?.description || cg?.description || ti?.description;
-  const name = ds?.name || ti?.name;
-  const symbol = ds?.symbol || ti?.symbol;
-  const image = ds?.image || cg?.imageUrl || ti?.image;
-  const website = ds?.websites?.[0] || cg?.websites?.[0] || ti?.websites?.[0];
-  const lockedAddresses = ds?.lockedAddresses || ti?.lockedAddresses;
-  const totalSupply =
-    ds?.supplies.totalSupply || cg?.totalSupply || ti?.supplies.totalSupply;
-  const burnedSupply = ds?.supplies.burnedSupply || ti?.supplies.burnedSupply;
-  const lockedSupply = ds?.supplies.lockedSupply || ti?.supplies.lockedSupply;
-  const circulatingSupply =
-    ds?.supplies.circulatingSupply || ti?.supplies.circulatingSupply;
+    const socials = ds?.socials || cg?.social || ti?.socials;
+    const description = ds?.description || cg?.description || ti?.description;
+    const name = ds?.name || ti?.name;
+    const symbol = ds?.symbol || ti?.symbol;
+    const image = ds?.image || cg?.imageUrl || ti?.image;
+    const website = ds?.websites?.[0] || cg?.websites?.[0] || ti?.websites?.[0];
+    const lockedAddresses = ds?.lockedAddresses || ti?.lockedAddresses;
+    const totalSupply =
+      ds?.supplies.totalSupply || cg?.totalSupply || ti?.supplies.totalSupply;
+    const burnedSupply = ds?.supplies.burnedSupply || ti?.supplies.burnedSupply;
+    const lockedSupply = ds?.supplies.lockedSupply || ti?.supplies.lockedSupply;
+    const circulatingSupply =
+      ds?.supplies.circulatingSupply || ti?.supplies.circulatingSupply;
 
-  return NextResponse.json({
-    status: 200,
-    socials,
-    description,
-    name,
-    symbol,
-    image,
-    website,
-    lockedAddresses,
-    totalSupply,
-    burnedSupply,
-    lockedSupply,
-    circulatingSupply,
-  });
+    return NextResponse.json({
+      status: 200,
+      socials,
+      description,
+      name,
+      symbol,
+      image,
+      website,
+      lockedAddresses,
+      totalSupply,
+      burnedSupply,
+      lockedSupply,
+      circulatingSupply,
+    });
+  } catch (error) {
+    console.log({ error });
+    return NextResponse.json({
+      error: "Something went wrong",
+      status: 500,
+    });
+  }
 }

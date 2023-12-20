@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
 import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 import { dasApi } from "@metaplex-foundation/digital-asset-standard-api";
-import { getTokenHolderCount, getTokenHolders } from "@/utils";
 
 export type AssetFromDas = {
   interface: string;
@@ -85,12 +84,18 @@ export async function POST(req: NextRequest) {
     .use(mplTokenMetadata())
     .use(dasApi());
 
-  const asset = await umi.rpc.getAsset(address);
-
-  return NextResponse.json({
-    asset: {
-      ...asset,
-    },
-    status: 200,
-  });
+  try {
+    const asset = await umi.rpc.getAsset(address);
+    return NextResponse.json({
+      asset: {
+        ...asset,
+      },
+      status: 200,
+    });
+  } catch (e) {
+    return NextResponse.json({
+      error: "Asset not found",
+      status: 404,
+    });
+  }
 }

@@ -1,5 +1,14 @@
 import { User } from "@nhost/nhost-js";
 
+export type TokenBalance = {
+  tokenAccount: string;
+  mint: string;
+  amount: number;
+  decimals: number;
+  symbol: string;
+  name: string;
+};
+
 export type Coin = {
   id: string;
   name: string;
@@ -23,4 +32,12 @@ export type Wallet = {
   bot?: Bot;
   user: User;
   isActiveWallet: boolean;
+};
+
+export type EnhancedWallet = Wallet & {
+  shortAddress: string | null;
+  balances: {
+    splTokens: TokenBalance[];
+    sol: number;
+  };
 };
