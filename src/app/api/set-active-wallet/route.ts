@@ -1,8 +1,6 @@
 import { client } from "@/client/backend-client";
-import { ADD_KEYPAIR } from "@/graphql/mutations/add-keypair";
-import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { SET_ACTIVE_WALLET } from "@/graphql/mutations/set-active-wallet";
-import { UNSET_ACTIVE_WALLET } from "@/graphql/mutations/uset-active-wallet";
+import { UNSET_ACTIVE_WALLET } from "@/graphql/mutations/unset-active-wallet";
 import { GET_ACTIVE_WALLET } from "@/graphql/queries/get-active-wallet";
 import { Wallet } from "@/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -38,7 +36,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    await client.request({
+    const {
+      update_wallets,
+    }: {
+      update_wallets: {
+        returning: Wallet[];
+      };
+    } = await client.request({
       document: SET_ACTIVE_WALLET,
       variables: {
         address,
@@ -47,6 +51,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       status: 200,
+      wallet: update_wallets.returning[0],
     });
   } catch (error) {
     console.log(error);

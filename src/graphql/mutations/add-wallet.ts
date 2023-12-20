@@ -7,6 +7,7 @@ export const ADD_WALLET = gql`
     ) {
       id
       address
+      isActiveWallet
     }
   }
 `;

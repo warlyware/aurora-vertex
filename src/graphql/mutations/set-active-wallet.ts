@@ -8,6 +8,8 @@ export const SET_ACTIVE_WALLET = gql`
     ) {
       returning {
         id
+        address
+        isActiveWallet
       }
     }
   }

@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={classNames([inter.className, "bg-blue-700"])}>
-        <main className="flex min-h-screen flex-col items-center justify-between">
+        <main className="flex min-h-screen flex-col items-center">
           <ContextProvider>{children}</ContextProvider>
         </main>
       </body>

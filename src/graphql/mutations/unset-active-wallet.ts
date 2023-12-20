@@ -8,6 +8,8 @@ export const UNSET_ACTIVE_WALLET = gql`
     ) {
       returning {
         id
+        address
+        isActiveWallet
       }
     }
   }

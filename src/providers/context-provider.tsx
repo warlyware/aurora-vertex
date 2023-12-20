@@ -21,10 +21,11 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import { SnackbarProvider, useSnackbar } from "notistack";
 import { FC, ReactNode, useCallback, useMemo } from "react";
-import { NhostClient, NhostProvider } from "@nhost/nextjs";
+import { NhostProvider } from "@nhost/nextjs";
 import { NhostApolloProvider } from "@nhost/react-apollo";
 import { RPC_ENDPOINT } from "@/constants";
 import { nhost } from "@/client";
+import { AuroraProvider } from "@/hooks";
 require("@solana/wallet-adapter-react-ui/styles.css");
 
 const theme = createTheme({
@@ -101,11 +102,15 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} onError={onError} autoConnect={true}>
-        <MaterialUIWalletDialogProvider>
-          <AntDesignWalletModalProvider>
-            <ReactUIWalletModalProvider>{children}</ReactUIWalletModalProvider>
-          </AntDesignWalletModalProvider>
-        </MaterialUIWalletDialogProvider>
+        <AuroraProvider>
+          <MaterialUIWalletDialogProvider>
+            <AntDesignWalletModalProvider>
+              <ReactUIWalletModalProvider>
+                {children}
+              </ReactUIWalletModalProvider>
+            </AntDesignWalletModalProvider>
+          </MaterialUIWalletDialogProvider>
+        </AuroraProvider>
       </WalletProvider>
     </ConnectionProvider>
   );

@@ -56,15 +56,15 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       status: 200,
-      ...insert_wallets_one,
+      wallet: {
+        ...insert_wallets_one,
+      },
     });
   } catch (error) {
     console.log(error);
     return NextResponse.json({
       status: 500,
-      body: {
-        error: "Error creating wallet",
-      },
+      error: "Error creating wallet",
     });
   }
 }

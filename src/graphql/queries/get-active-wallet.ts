@@ -5,8 +5,9 @@ export const GET_ACTIVE_WALLET = gql`
     wallets(
       where: { isActiveWallet: { _eq: true }, userId: { _eq: $userId } }
     ) {
-      address
       id
+      address
+      isActiveWallet
     }
   }
 `;
