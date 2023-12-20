@@ -3,26 +3,28 @@ import { PrimaryButton } from "@/components/UI/buttons/primary-button";
 import CenterContentWrapper from "@/components/UI/center-content-wrapper";
 import { PageWrapper } from "@/components/UI/page-wrapper";
 import { BASE_URL } from "@/constants";
+import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 import { useState } from "react";
 
 export default function CreateWallet() {
+  const user = useUserData();
   const [address, setAddress] = useState("");
   const handleCreateWallet = async () => {
-    const { data } = await axios.post(`${BASE_URL}/api/create-wallet`);
+    if (!user) return;
 
-    console.log(data);
+    const { data } = await axios.post(`${BASE_URL}/api/create-wallet`, {
+      userId: user.id,
+    });
 
     setAddress(data.publicKey);
   };
   return (
     <PageWrapper>
       <CenterContentWrapper>
-        <div className="flex flex-col h-full w-full min-h-screen justify-center items-center">
-          <PrimaryButton onClick={handleCreateWallet}>
-            Create Wallet
-          </PrimaryButton>
-        </div>
+        <PrimaryButton onClick={handleCreateWallet}>
+          Create Wallet
+        </PrimaryButton>
       </CenterContentWrapper>
     </PageWrapper>
   );

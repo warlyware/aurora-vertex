@@ -7,3 +7,4 @@ export const RAYDIUM_LIQUIDITY_POOL_DATA_JSON_URL =
   "https://api.raydium.io/v2/sdk/liquidity/mainnet.json";
 export const RAYDIUM_STAKING_POOL_DATA_JSON_URL =
   "https://api.raydium.io/v2/sdk/farm/mainnet.json";
+export const SOL_TOKEN_ADDRESS = "So11111111111111111111111111111111111111112";

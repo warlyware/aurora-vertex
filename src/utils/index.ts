@@ -15,7 +15,7 @@ export type TokenHoldersList = {
 };
 
 export const getAbbreviatedAddress = (
-  address: string | PublicKeyCredential,
+  address?: string | PublicKeyCredential | null,
   identifierLength: number = 4
 ) => {
   if (!address) return "";

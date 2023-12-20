@@ -5,6 +5,8 @@ import { Keypair } from "@solana/web3.js";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
+  const { userId } = await req.json();
+
   const keypair = Keypair.generate();
 
   const publicKey = keypair.publicKey.toString();
@@ -41,18 +43,20 @@ export async function POST(req: NextRequest) {
       insert_wallets_one: {
         id: string;
         address: string;
+        userId: string;
       };
     } = await client.request({
       document: ADD_WALLET,
       variables: {
         address: publicKey,
         keypairId,
+        userId,
       },
     });
 
     return NextResponse.json({
       status: 200,
-      publicKey,
+      ...insert_wallets_one,
     });
   } catch (error) {
     console.log(error);
