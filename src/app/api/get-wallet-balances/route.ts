@@ -76,11 +76,15 @@ export async function POST(req: NextRequest) {
       symbol = coin.symbol;
       name = coin.name;
     } else {
-      const asset = await umi.rpc.getAsset(publicKey(balance.mint));
-      console.log({ asset });
-      const dasApiAsset = asset as DasApiAsset;
-      symbol = dasApiAsset?.content?.metadata?.symbol || "";
-      name = dasApiAsset?.content?.metadata?.name || "";
+      try {
+        const asset = await umi.rpc.getAsset(publicKey(balance.mint));
+        console.log({ asset });
+        const dasApiAsset = asset as DasApiAsset;
+        symbol = dasApiAsset?.content?.metadata?.symbol || "";
+        name = dasApiAsset?.content?.metadata?.name || "";
+      } catch (error) {
+        console.error({ error });
+      }
     }
   }
 

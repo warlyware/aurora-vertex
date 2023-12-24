@@ -77,15 +77,15 @@ export const createSwapTransaction = async (
 
 export const getQuoteFromJupiter = async (
   baseAmount: number,
-  inputAddress: string = SOL_TOKEN_ADDRESS,
   outputAddress: string,
+  inputAddress: string = SOL_TOKEN_ADDRESS,
   allowedSlippageInPercent: number = 0.5
 ) => {
-  return await (
-    await fetch(
-      `https://quote-api.jup.ag/v6/quote?inputMint=${inputAddress}&outputMint=${outputAddress}&amount=${baseAmount}&slippageBps=${
-        allowedSlippageInPercent * 100
-      }`
-    )
-  ).json();
+  const amount = String(baseAmount);
+  const url = `https://quote-api.jup.ag/v6/quote?inputMint=${inputAddress}&outputMint=${outputAddress}&amount=${amount}&slippageBps=${
+    allowedSlippageInPercent * 100
+  }`;
+  console.log({ url });
+  debugger;
+  return await (await fetch(url)).json();
 };

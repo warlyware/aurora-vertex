@@ -1,113 +1,97 @@
 import { Connection, PublicKey } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+
 import {
-  TokenAccount,
+  LiquidityPoolKeys,
+  Liquidity,
+  TokenAmount,
+  Token,
+  Percent,
+  TOKEN_PROGRAM_ID,
   SPL_ACCOUNT_LAYOUT,
-  LIQUIDITY_STATE_LAYOUT_V4,
+  TokenAccount,
 } from "@raydium-io/raydium-sdk";
-import { OpenOrders } from "@project-serum/serum";
-import BN from "bn.js";
-import { RPC_ENDPOINT } from "@/constants";
 
-async function getTokenAccounts(connection: Connection, owner: PublicKey) {
-  if (!RPC_ENDPOINT) {
-    throw new Error("RPC_ENDPOINT is not defined");
-    return;
-  }
-
+export async function getTokenAccountsByOwner(
+  connection: Connection,
+  owner: PublicKey
+) {
   const tokenResp = await connection.getTokenAccountsByOwner(owner, {
     programId: TOKEN_PROGRAM_ID,
   });
 
   const accounts: TokenAccount[] = [];
+
   for (const { pubkey, account } of tokenResp.value) {
     accounts.push({
       pubkey,
       accountInfo: SPL_ACCOUNT_LAYOUT.decode(account.data),
-      programId: account.owner,
+      programId: TOKEN_PROGRAM_ID,
     });
   }
 
   return accounts;
 }
 
-// raydium pool id can get from api: https://api.raydium.io/v2/sdk/liquidity/mainnet.json
-const SOL_USDC_POOL_ID = "58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWBkwMihLYQo2";
-const OPENBOOK_PROGRAM_ID = new PublicKey(
-  "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX"
-);
+/**
+ * swapInDirection: used to determine the direction of the swap
+ * Eg: RAY_SOL_LP_V4_POOL_KEY is using SOL as quote token, RAY as base token
+ * If the swapInDirection is true, currencyIn is RAY and currencyOut is SOL
+ * vice versa
+ */
+export async function calcAmountOut(
+  connection: Connection,
+  poolKeys: LiquidityPoolKeys,
+  rawAmountIn: number,
+  swapInDirection: boolean
+) {
+  const poolInfo = await Liquidity.fetchInfo({ connection, poolKeys });
+  let currencyInMint = poolKeys.baseMint;
+  let currencyInDecimals = poolInfo.baseDecimals;
+  let currencyOutMint = poolKeys.quoteMint;
+  let currencyOutDecimals = poolInfo.quoteDecimals;
 
-export async function parsePoolInfo() {
-  const connection = new Connection(RPC_ENDPOINT, "confirmed");
-  const owner = new PublicKey("VnxDzsZ7chE88e9rB6UKztCt2HUwrkgCTx8WieWf5mM");
-
-  const tokenAccounts = await getTokenAccounts(connection, owner);
-
-  // example to get pool info
-  const info = await connection.getAccountInfo(new PublicKey(SOL_USDC_POOL_ID));
-  if (!info) return;
-
-  const poolState = LIQUIDITY_STATE_LAYOUT_V4.decode(info.data);
-  const openOrders = await OpenOrders.load(
-    connection,
-    poolState.openOrders,
-    OPENBOOK_PROGRAM_ID // OPENBOOK_PROGRAM_ID(marketProgramId) of each pool can get from api: https://api.raydium.io/v2/sdk/liquidity/mainnet.json
-  );
-
-  const baseDecimal = 10 ** poolState.baseDecimal.toNumber(); // e.g. 10 ^ 6
-  const quoteDecimal = 10 ** poolState.quoteDecimal.toNumber();
-
-  const baseTokenAmount = await connection.getTokenAccountBalance(
-    poolState.baseVault
-  );
-  const quoteTokenAmount = await connection.getTokenAccountBalance(
-    poolState.quoteVault
-  );
-
-  const basePnl = poolState.baseNeedTakePnl.toNumber() / baseDecimal;
-  const quotePnl = poolState.quoteNeedTakePnl.toNumber() / quoteDecimal;
-
-  const openOrdersBaseTokenTotal =
-    openOrders.baseTokenTotal.toNumber() / baseDecimal;
-  const openOrdersQuoteTokenTotal =
-    openOrders.quoteTokenTotal.toNumber() / quoteDecimal;
-
-  const base =
-    (baseTokenAmount.value?.uiAmount || 0) + openOrdersBaseTokenTotal - basePnl;
-  const quote =
-    (quoteTokenAmount.value?.uiAmount || 0) +
-    openOrdersQuoteTokenTotal -
-    quotePnl;
-
-  const denominator = new BN(10).pow(poolState.baseDecimal);
-
-  if (!tokenAccounts) {
-    console.log("no token accounts");
-    return;
+  if (!swapInDirection) {
+    currencyInMint = poolKeys.quoteMint;
+    currencyInDecimals = poolInfo.quoteDecimals;
+    currencyOutMint = poolKeys.baseMint;
+    currencyOutDecimals = poolInfo.baseDecimals;
   }
 
-  const addedLpAccount = tokenAccounts.find((a) =>
-    a.accountInfo.mint.equals(poolState.lpMint)
+  const currencyIn = new Token(
+    TOKEN_PROGRAM_ID,
+    currencyInMint,
+    currencyInDecimals
   );
-
-  console.log(
-    "SOL_USDC pool info:",
-    "pool total base " + base,
-    "pool total quote " + quote,
-
-    "base vault balance " + baseTokenAmount.value.uiAmount,
-    "quote vault balance " + quoteTokenAmount.value.uiAmount,
-
-    "base tokens in openorders " + openOrdersBaseTokenTotal,
-    "quote tokens in openorders  " + openOrdersQuoteTokenTotal,
-
-    "base token decimals " + poolState.baseDecimal.toNumber(),
-    "quote token decimals " + poolState.quoteDecimal.toNumber(),
-    "total lp " + poolState.lpReserve.div(denominator).toString(),
-
-    "addedLpAmount " +
-      (addedLpAccount?.accountInfo.amount.toNumber() || 0) / baseDecimal
+  const amountIn = new TokenAmount(currencyIn, rawAmountIn, false);
+  const currencyOut = new Token(
+    TOKEN_PROGRAM_ID,
+    currencyOutMint,
+    currencyOutDecimals
   );
+  const slippage = new Percent(5, 100); // 5% slippage
+
+  const {
+    amountOut,
+    minAmountOut,
+    currentPrice,
+    executionPrice,
+    priceImpact,
+    fee,
+  } = Liquidity.computeAmountOut({
+    poolKeys,
+    poolInfo,
+    amountIn,
+    currencyOut,
+    slippage,
+  });
+
+  return {
+    amountIn,
+    amountOut,
+    minAmountOut,
+    currentPrice,
+    executionPrice,
+    priceImpact,
+    fee,
+  };
 }
-
-parsePoolInfo();

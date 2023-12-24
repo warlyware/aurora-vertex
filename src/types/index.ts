@@ -16,6 +16,7 @@ export type Coin = {
   priceInUSD: number;
   decimals: number;
   totalSupply: number;
+  address: string;
 };
 
 type Bot = unknown;

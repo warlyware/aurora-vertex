@@ -10,26 +10,21 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 
 export default function Jupiter() {
-  const [tokens, setTokens] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [tokensCount, setTokensCount] = useState(0);
   const [isFetched, setIsFetched] = useState(false);
 
-  const { loading } = useQuery(GET_COINS_ON_JUPITER, {
-    onCompleted: ({ coinsOnJupiter }) => {
-      setTokens(coinsOnJupiter.slice(0, 10));
-      setTokensCount(coinsOnJupiter.length);
-      setIsLoading(false);
-    },
-  });
+  const getCreatePoolCalls = useCallback(async () => {
+    setIsFetched(true);
+    const calls = await findProgramFunctionCalls(
+      "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+      "createPool"
+    );
+    console.log(calls);
+  }, []);
 
   return (
     <>
       <CenterContentWrapper>
-        {isLoading && <Spinner />}
-        <div className="flex flex-wrap">
-          {<>{!!tokensCount && <>{JSON.stringify(tokens, null, 2)}</>}</>}
-        </div>
+        <button onClick={getCreatePoolCalls}>get pools</button>
       </CenterContentWrapper>
     </>
   );

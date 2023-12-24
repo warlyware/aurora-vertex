@@ -45,6 +45,13 @@ export const getTokenHolders = async (
 
     console.log({ data });
 
+    if (!data?.data) {
+      return {
+        total: 0,
+        holders: [],
+      };
+    }
+
     return {
       total: data.data.total,
       holders: data.data.result,

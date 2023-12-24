@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     return NextResponse.json({
       error: "Asset not found",
-      status: 404,
+      status: 200,
     });
   }
 }

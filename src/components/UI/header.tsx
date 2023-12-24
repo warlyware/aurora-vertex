@@ -11,7 +11,9 @@ export const Header = () => {
   return (
     <div className="flex p-4 px-9 mx-auto w-full justify-between items-center text-sm uppercase h-16 z-10 fixed">
       <div className="flex w-full space-x-8 items-center">
-        <div className="mr-8">aurora vertex</div>
+        <Link href="/dashboard" className="mr-8">
+          aurora vertex
+        </Link>
         <Link href="/dashboard">coins</Link>
         <Link href="/wallet">wallets</Link>
         <div className="flex-1"></div>

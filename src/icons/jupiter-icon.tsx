@@ -1,0 +1,13 @@
+import Image from "next/image";
+
+export const JupiterIcon = () => {
+  return (
+    <Image
+      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAADkElEQVQ4jXWTfWhVZRzHf7/nec6559xzd+69251ujs0N3Fg5CoySsfrjXuVud5ZkMhk1BkviZjHSKJnpQMdSalTEyIqwsNTVelsvUtrLxqYphuUSoqnERLnOvdzd15177znP8/RHCAr1/f8D3y98Pwj/k7PpfUHJ6eMSRC0hOAsSv7HysS+Dyw5mpAREBAkAgLeAtuE2+liwZbmQGUOjOWu1gGQmMJwTmUcaHUGfJoQ8TCjMcgefbzRf+voWhwCAe0f30or6lWGV5DdoaK9WkHtdRGQZ4ecV4O+H/D2Tvyz1V6ADg4yRTY7DexrN3lekBMT/qv9t4oDf5mpIBWhjRIQYyEuI/LmQb9f508m+dorkHS6hu8m75yN8YeaEQZYyEZcUTRrjukqdq4zaZ776q/rUWDDofJ98fZXgvFdB2IjAD6/392yfmOu7j2q4X+F8G0anju/SqYjoxM66KDcUcFaoyCtdVCQUFEdFXr76bE3XzMj8wFqNkQ+I5LGEr7p5ZfZiQ0GwKtxxbVh/o3KLdfuEl/8+fI9C6WaFQVQlUmXgHIiWdw18ODNg+BQ6TBFY9sczrdAGFDdcONurMbtZR6fYRXlaRfuiQsVnpxPXf1qXS2iBmso9GpU7KdgneTrVMfH7RLw91HScIPy6qWR7L4Ynz43pxImrxCm40KlQkK8p8utumUlNE8fpf7N+46H9V480qRRHGPJrOrIwQAw8RPuYMuzGutGpgNvH/Z5CGhldihcTYZiqbKRU7C4qMRpkOjmSTOW7qrXUMq1ImyDCvrCzqqP5UOzdMEpZQlRdPEWAXeJMn5LE+0cKzb7rtjHz52LigcSitdvWzEc9pntsOmfOpiwZsYS6rm966MmtK6InE0Ifx6rxy3e73dBhyIKfIn/QKDYbVFkAyCwem7fpM3X6YrPb4/6EWNkT79WHW3qufNGPBEJXapyHPsUt/N8jjcYCFZpo02R60kvzyxVGXywqK2mE+Ru/3URlfZ2Ye8Is9Q/yZLLd65/7GbPuY1KSzYO1rSkCUmKxlS1IR9yfR89oHAMtCUvpSt5YeK3gK19T4oihz+8NvRWPW+MZwbrTuWw6bav9g6si6TtkAgAoPTWzVVFxH+WFpQJ3OsvVfKdeVrotdzPWWapaCZRyBzEWIt/VtuZvl+nOHLlsllW7o4Q41CWVIV1dOqhC4YeMb/rt4niN59zauxZASgRECQDwDwnuk38+trx3AAAAAElFTkSuQmCC"
+      className="w-8 h-8"
+      alt="jupiter-icon"
+      height={32}
+      width={32}
+    />
+  );
+};

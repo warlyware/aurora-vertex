@@ -43,19 +43,14 @@ export default function CoinDetailPage({ params }: { params: any }) {
     fetchCoin();
   }, [address, fetchCoin]);
 
-  if (isLoading) {
-    return (
-      <PageWrapper>
-        <CenterPageContentWrapper>
-          <Spinner />
-        </CenterPageContentWrapper>
-      </PageWrapper>
-    );
-  }
-
   return (
     <>
       {!!user?.id && <Header />}
+      {isLoading && (
+        <div className="pt-48">
+          <Spinner />
+        </div>
+      )}
       <PageWrapper>
         {!!coin && (
           <div className="flex w-full h-full max-w-5xl">
@@ -147,10 +142,10 @@ export default function CoinDetailPage({ params }: { params: any }) {
                   </div>
                 )}
               </div>
-              <TokenLinks address={address} />
             </div>
           </div>
         )}
+        <TokenLinks address={address} symbol={coin?.symbol} />
       </PageWrapper>
     </>
   );
