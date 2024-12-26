@@ -61,42 +61,6 @@ export async function POST(req: NextRequest) {
   let symbol: string;
   let name: string;
 
-  for (const balance of balances) {
-    const {
-      coins,
-    }: {
-      coins: Coin[];
-    } = await client.request(GET_COIN_BY_ADDRESS, {
-      address: balance.mint,
-    });
-
-    const coin = coins[0];
-
-    if (coin) {
-      symbol = coin.symbol;
-      name = coin.name;
-    } else {
-      try {
-        const asset = await umi.rpc.getAsset(publicKey(balance.mint));
-        console.log({ asset });
-        const dasApiAsset = asset as DasApiAsset;
-        symbol = dasApiAsset?.content?.metadata?.symbol || "";
-        name = dasApiAsset?.content?.metadata?.name || "";
-      } catch (error) {
-        console.error({ error });
-      }
-    }
-  }
-
-  balances = balances.map((balance) => {
-    return {
-      ...balance,
-      // prepend $ if symbol is missing currency symbol
-      symbol: symbol.startsWith("$") ? symbol : `$${symbol}`,
-      name,
-    };
-  });
-
   const solBalance = lamportsBalance / 10 ** 9;
 
   return NextResponse.json({

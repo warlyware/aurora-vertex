@@ -9,6 +9,7 @@ import { BorshInstructionCoder, Instruction } from "@project-serum/anchor";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { ProgramId } from "@raydium-io/raydium-sdk";
 import fs from "fs";
+import base58 from "bs58";
 
 export const MAINNET_PROGRAM_ID: ProgramId = {
   SERUM_MARKET: new PublicKey("9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin"),
@@ -141,4 +142,16 @@ export async function findProgramFunctionCalls(
 
 export const isSol = (mint: string) => {
   return mint === SOL_TOKEN_ADDRESS;
+};
+
+export const getStringFromByteArrayString = (byteArrayString: string) => {
+  if (!byteArrayString?.length) return "";
+
+  const byteValues = byteArrayString.split(",").map(Number);
+  const buffer = Buffer.from(byteValues);
+  const base58Signature = base58.encode(buffer);
+
+  console.log(base58Signature);
+
+  return base58Signature;
 };

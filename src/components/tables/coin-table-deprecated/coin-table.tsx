@@ -30,6 +30,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
           .map((coin) => {
             return {
               ...coin,
+              symbol: (coin.symbol.startsWith("$") ? "" : "$") + coin.symbol,
             };
           })
           .filter((coin) => coin.name?.length)
@@ -42,7 +43,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
       {
         header: () => <div className="uppercase py-2 mr-4 px-4"></div>,
         size: 8,
-        accessorKey: "logoURI",
+        accessorKey: "imageUrl",
         cell: (info) => (
           <>
             {!!info?.getValue() && (
@@ -58,6 +59,17 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         ),
       },
       {
+        header: () => <div className="uppercase py-2 mr-4 px-4">Symbol</div>,
+        size: 25,
+        accessorKey: "symbol",
+        cell: (info) => (
+          <div className="flex flex-col px-4">
+            {/* prepend $ only if none exist */}
+            <div className="truncate">{`${info.getValue()}`}</div>
+          </div>
+        ),
+      },
+      {
         header: () => <div className="uppercase py-2 mr-4 px-4">Name</div>,
         size: 50,
         accessorKey: "name",
@@ -68,23 +80,11 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         ),
       },
       {
-        header: () => <div className="uppercase py-2 mr-4 px-4">Liquidity</div>,
-        size: 30,
-        accessorKey: "liquidity",
-        cell: (info) => (
-          <div className="flex flex-col px-4">
-            <div className="truncate">{`$${
-              Number(info?.getValue()).toFixed(2) ?? 0
-            }`}</div>
-          </div>
-        ),
-      },
-      {
         header: () => (
           <div className="uppercase py-2 mr-4 px-4">Market Cap</div>
         ),
         size: 40,
-        accessorKey: "mc",
+        accessorKey: "marketCap",
         cell: (info) => (
           <div className="flex flex-col px-4">
             <div>{`$${Number(info?.getValue()).toFixed(2)}`}</div>
@@ -95,8 +95,8 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         header: () => (
           <div className="uppercase py-2 mr-4 px-4">24h Change</div>
         ),
-        size: 60,
-        accessorKey: "v24hChangePercent",
+        size: 30,
+        accessorKey: "v24hrChangePercent",
         cell: (info) => (
           <div className="flex flex-col px-4">
             <div>{`${Number(info?.getValue()).toFixed(2)}%`}</div>
@@ -104,9 +104,9 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         ),
       },
       {
-        header: () => <div className="uppercase py-2 mr-4 px-4">24h Vol</div>,
-        size: 30,
-        accessorKey: "v24hUSD",
+        header: () => <div className="uppercase py-2 mr-4 px-4">24h Price</div>,
+        size: 50,
+        accessorKey: "v24hrUSD",
         cell: (info) => (
           <div className="flex flex-col px-4">
             <div>{`$${Number(info?.getValue()).toFixed(2)}`}</div>
@@ -164,7 +164,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const { rows } = table.getRowModel();
+  const { rows } = table?.getRowModel();
 
   return (
     <div className="w-full" style={{ padding: "0.5rem" }}>

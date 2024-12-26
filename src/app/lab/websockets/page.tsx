@@ -4,24 +4,31 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import { PrimaryButton } from "@/components/UI/buttons/primary-button";
 import CenterPageContentWrapper from "@/components/UI/center-page-content-wrapper";
 import { PageWrapper } from "@/components/UI/page-wrapper";
-import { AURORA_VERTEX_WS_URL } from "@/constants";
+import { AURORA_VERTEX_WS_URL, BASE_URL, SOL_TOKEN_ADDRESS } from "@/constants";
 import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
 import { Day, Month, Year } from "@/types/datetime";
 import { RaydiumLiquidityPool } from "@/types/raydium";
-import { LiquidityPoolList } from "@/components/liquidity-pools/liquidity-pool-list";
 import { TokenPrice } from "@/components/tokens/token-price";
+import {
+  LiquidityPoolTable,
+  RaydiumLiquidityPoolWithMeta,
+} from "@/components/tables/liquidity-pool-table";
+import axios from "axios";
+
+type TimeStampedLiquidityPool = RaydiumLiquidityPool & {
+  timestamp: number;
+} & RaydiumLiquidityPoolWithMeta;
 
 export default function WebSocketComponent() {
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     `${AURORA_VERTEX_WS_URL}`
   );
   const [allPools, setAllPools] = useState<RaydiumLiquidityPool[]>([]);
-  const [freshPools, setFreshPools] = useState<RaydiumLiquidityPool[]>([]);
+  const [freshPools, setFreshPools] = useState<TimeStampedLiquidityPool[]>([]);
   const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
   const [latencyInMs, setLatencyInMs] = useState(0);
 
   const {
-    COIN_QUOTE_REQUEST,
     GET_LIQUIDITY_POOLS_FROM_RAYDIUM,
     GET_LIQUIDITY_POOLS_FROM_RAYDIUM_RESPONSE,
     PING,
@@ -56,7 +63,7 @@ export default function WebSocketComponent() {
       const month = (new Date().getMonth() + 1)
         .toString()
         .padStart(2, "0") as Month;
-      const day = new Date().getDate().toString().padStart(2, "0") as Day;
+      let day = new Date().getDate().toString().padStart(2, "0") as Day;
 
       console.log({ year, month, day });
 
@@ -99,7 +106,7 @@ export default function WebSocketComponent() {
   }, [sendMessage, PING, handleGetLiquidityPools]);
 
   const handleMessageData = useCallback(
-    ({ type, payload }: AuroraMessage) => {
+    async ({ type, payload }: AuroraMessage) => {
       switch (type) {
         case GET_LIQUIDITY_POOLS_FROM_RAYDIUM_RESPONSE:
           const receivedPools = payload.pools;
@@ -112,8 +119,26 @@ export default function WebSocketComponent() {
               )
             : [];
 
-          // Append new pools to freshPools
-          setFreshPools((prevPools) => [...prevPools, ...newPools]);
+          for (const pool of newPools) {
+            pool.timestamp = Date.now();
+            const { data } = await axios.post(
+              `${BASE_URL}/api/get-token-price-info-from-dexscreener`,
+              {
+                address:
+                  pool.baseMint === SOL_TOKEN_ADDRESS
+                    ? pool.quoteMint
+                    : pool.baseMint,
+              }
+            );
+            console.log(data.tokenInfo);
+            pool.meta = data.tokenInfo;
+          }
+
+          setFreshPools((prevPools) =>
+            [...prevPools, ...newPools].sort(
+              (a, b) => b.timestamp - a.timestamp
+            )
+          );
 
           // Update allPools with the new data
           setAllPools(receivedPools);
@@ -160,7 +185,8 @@ export default function WebSocketComponent() {
         >
           Swap
         </PrimaryButton>
-        <LiquidityPoolList pools={freshPools} />
+        {/* <LiquidityPoolList pools={freshPools} /> */}
+        <LiquidityPoolTable pools={freshPools} />
         <TokenPrice address={allPools[0]?.baseMint} />
         {JSON.stringify(
           allPools.map((pool) => pool.baseMint),

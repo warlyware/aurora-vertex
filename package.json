@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -14,6 +14,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@heroicons/react": "^2.0.18",
+    "@jup-ag/core": "4.0.0-beta.21",
     "@metaplex-foundation/digital-asset-standard-api": "^1.0.0",
     "@metaplex-foundation/mpl-bubblegum": "^3.0.0",
     "@metaplex-foundation/mpl-token-metadata": "^3.1.2",
@@ -21,6 +22,7 @@
     "@metaplex-foundation/umi": "^0.8.10",
     "@metaplex-foundation/umi-bundle-defaults": "^0.8.10",
     "@metaplex-foundation/umi-signer-wallet-adapters": "^0.8.10",
+    "@metaplex-foundation/umi-web3js-adapters": "^0.9.1",
     "@mui/material": "^5.15.0",
     "@nhost/nextjs": "^1.13.40",
     "@nhost/nhost-js": "^2.2.18",
@@ -38,6 +40,7 @@
     "@solana/web3.js": "^1.87.6",
     "@tanstack/react-table": "^8.11.0",
     "@types/bn.js": "^5.1.5",
+    "@types/promise-retry": "^1.1.6",
     "add": "^2.0.6",
     "axios": "^1.6.2",
     "bn.js": "^5.2.1",
@@ -45,16 +48,20 @@
     "cheerio": "1.0.0-rc.12",
     "classnames": "^2.3.2",
     "cross-fetch": "^4.0.0",
+    "dayjs": "^1.11.10",
     "formik": "^2.4.5",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
+    "jsbi": "^4.3.0",
     "lodash.isequal": "^4.5.0",
-    "next": "14.0.4",
+    "next": "15.1.2",
+    "node-fetch": "^3.3.2",
     "notistack": "^3.0.1",
     "pino-pretty": "^10.3.0",
+    "promise-retry": "^2.0.1",
     "puppeteer": "^21.6.1",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "react-hot-toast": "^2.4.1",
     "react-use-websocket": "^4.5.0",
     "react-virtuoso": "^4.6.2",
@@ -63,14 +70,20 @@
   "devDependencies": {
     "@types/lodash.isequal": "^4.5.8",
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
     "@types/ws": "^8.5.10",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
-    "eslint-config-next": "14.0.4",
+    "eslint-config-next": "15.1.2",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.0.2",
+      "@types/react-dom": "19.0.2"
+    }
   }
 }

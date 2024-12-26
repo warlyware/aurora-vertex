@@ -8,12 +8,14 @@ import { BASE_URL } from "@/constants";
 import { useAurora } from "@/hooks";
 import { EnhancedWallet, Wallet } from "@/types";
 import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
+import { Button } from "@mui/material";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 
-export default function WalletDetails({ params }: { params: any }) {
+export default function WalletDetails(props: { params: Promise<any> }) {
+  const params = use(props.params);
   const [wallet, setWallet] = useState<EnhancedWallet | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { userWallets } = useAurora();
@@ -32,6 +34,17 @@ export default function WalletDetails({ params }: { params: any }) {
     });
 
     setIsLoading(false);
+  };
+
+  const handleTestTx = async () => {
+    const { data } = await axios.post(`${BASE_URL}/api/swap-coins`, {
+      walletAddress: wallet?.address,
+      amountToSwap: 1,
+      inputTokenAddress: 'EPjFWdd5AufqSSqeM2qZ7xRegQFfTvHv3gQ1ZZi9tXz',
+      outputTokenAddress: 'DezU8Bz7b2y8M2u2h6eF3FgZ8McWQFzHTP7DPBLt79AD',
+    });
+
+    console.log(data);
   };
 
   useEffect(() => {
@@ -104,6 +117,9 @@ export default function WalletDetails({ params }: { params: any }) {
                     </div>
                   </div>
                 ))}
+                <Button onClick={handleTestTx}>
+                  Test
+                </Button>
               </div>
             )}
           </>

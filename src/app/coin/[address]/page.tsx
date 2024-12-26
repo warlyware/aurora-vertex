@@ -1,9 +1,7 @@
 "use client";
 import { GetTokenInfoFromDasResponse } from "@/app/api/get-token-info-from-das/route";
 import { GetTokenInfoFromDexscreenerResponse } from "@/app/api/get-token-info-from-dexscreener/route";
-import { GetTokenInfoFromHeliusResponse } from "@/app/api/get-token-info-from-helius/route";
 import { CopyToClipboardButton } from "@/components/UI/buttons/copy-to-clipboard-button";
-import CenterPageContentWrapper from "@/components/UI/center-page-content-wrapper";
 import { Header } from "@/components/UI/header";
 import { PageWrapper } from "@/components/UI/page-wrapper";
 import Spinner from "@/components/UI/spinner";
@@ -15,16 +13,16 @@ import { addCommasToNumber, truncateDescription } from "@/utils/formatting";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, use } from "react";
 
 type CoinInfo = GetTokenInfoFromDasResponse &
-  GetTokenInfoFromHeliusResponse &
   GetTokenInfoFromDexscreenerResponse & {
     holders: HolderFromSolscan[];
     holderCount: number;
   };
 
-export default function CoinDetailPage({ params }: { params: any }) {
+export default function CoinDetailPage(props: { params: Promise<any> }) {
+  const params = use(props.params);
   const user = useUserData();
   const { address } = params;
   const [coin, setCoin] = useState<CoinInfo | null>(null);
@@ -54,7 +52,7 @@ export default function CoinDetailPage({ params }: { params: any }) {
       <PageWrapper>
         {!!coin && (
           <div className="flex w-full h-full max-w-5xl">
-            <div className="w-1/2 h-full flex flex-col justify-center items-center px-4">
+            {/* <div className="w-1/2 h-full flex flex-col justify-center items-center px-4">
               <Image
                 src={coin.imageUrl}
                 alt={`${coin.name} logo`}
@@ -77,7 +75,7 @@ export default function CoinDetailPage({ params }: { params: any }) {
               <div className="mb-4 italic max-w-sm">
                 {truncateDescription(coin.description)}
               </div>
-            </div>
+            </div> */}
             <div className="w-1/2 h-full flex flex-col justify-center px-4">
               <div className="mb-4 pt-16">
                 Holders: {addCommasToNumber(coin.holderCount)}
@@ -103,7 +101,7 @@ export default function CoinDetailPage({ params }: { params: any }) {
                   Locked supply: {addCommasToNumber(coin.lockedSupply)}
                 </div>
               )}
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 Writable: {coin.isWritable ? "Yes" : "No"}
               </div>
               <div className="mb-4">
@@ -111,7 +109,7 @@ export default function CoinDetailPage({ params }: { params: any }) {
               </div>
               <div className="mb-4">
                 Freeze Authority: {coin.freezeAuthority || "None"}
-              </div>
+              </div> */}
               <div className="flex">
                 {!!coin.website?.url && (
                   <div className="mb-4 mr-4">

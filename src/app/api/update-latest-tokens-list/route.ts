@@ -3,8 +3,8 @@ import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { data, status } = await axios.post(
-    `${AURORA_VERTEX_API_URL}/update/token-list`
+  const { data, status } = await axios.get(
+    `${AURORA_VERTEX_API_URL}/compare-and-store-new-list`
   );
 
   return NextResponse.json({

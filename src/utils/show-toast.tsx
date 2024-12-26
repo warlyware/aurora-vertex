@@ -32,7 +32,7 @@ const showToast = ({
       }}
     >
       <div className="text-stone-800 font-bold">{primaryMessage}</div>
-      {/* {secondaryMessage && <div>{secondaryMessage}</div>}
+      {secondaryMessage && <div>{secondaryMessage}</div>}
       {link && (
         <a
           href={link.url}
@@ -43,7 +43,7 @@ const showToast = ({
           {link.title}
         </a>
       )}
-      {error && (
+      {/* {error && (
         <div className="text-sm font-bold text-red-600">
           Error Code {error.code}
         </div>

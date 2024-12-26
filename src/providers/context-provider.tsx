@@ -26,7 +26,7 @@ import { NhostApolloProvider } from "@nhost/react-apollo";
 import { RPC_ENDPOINT } from "@/constants";
 import { nhost } from "@/client";
 import { AuroraProvider } from "@/hooks";
-require("@solana/wallet-adapter-react-ui/styles.css");
+// require("@solana/wallet-adapter-react-ui/styles.css");
 
 const theme = createTheme({
   palette: {

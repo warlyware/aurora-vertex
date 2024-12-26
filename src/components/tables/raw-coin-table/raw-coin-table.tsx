@@ -12,55 +12,33 @@ import {
   ArrowUpIcon,
   LinkIcon,
 } from "@heroicons/react/24/outline";
-import { Coin } from "@/types";
-import { getAbbreviatedAddress } from "@/utils";
-import Image from "next/image";
 import Link from "next/link";
+import { TokenFromJupiter } from "@/app/dashboard/page";
 
-export const CoinTable = ({ coins }: { coins: Coin[] }) => {
+export const RawCoinTable = ({ coins }: { coins: TokenFromJupiter[] }) => {
   const rerender = React.useReducer(() => ({}), {})[1];
 
   const [sorting, setSorting] = React.useState([]);
-  const [formattedCoins, setFormattedCoins] = useState<Coin[]>([]);
+  const [formattedCoins, setFormattedCoins] = useState<TokenFromJupiter[]>([]);
 
   useEffect(() => {
     if (coins.length > 0) {
       setFormattedCoins(
-        coins
-          .map((coin) => {
-            return {
-              ...coin,
-            };
-          })
-          .filter((coin) => coin.name?.length)
+        coins.map((coin) => {
+          return {
+            ...coin,
+          };
+        })
       );
     }
   }, [coins]);
 
-  const columns = useMemo<ColumnDef<Coin>[]>(
+  const columns = useMemo<ColumnDef<TokenFromJupiter>[]>(
     () => [
       {
-        header: () => <div className="uppercase py-2 mr-4 px-4"></div>,
-        size: 8,
-        accessorKey: "logoURI",
-        cell: (info) => (
-          <>
-            {!!info?.getValue() && (
-              <Image
-                className="h-8 w-8 ml-4"
-                width={24}
-                height={24}
-                src={info?.getValue() as string}
-                alt={info?.getValue() as string}
-              />
-            )}
-          </>
-        ),
-      },
-      {
-        header: () => <div className="uppercase py-2 mr-4 px-4">Name</div>,
+        header: () => <div className="uppercase py-2 mr-4 px-4">PubKey</div>,
         size: 50,
-        accessorKey: "name",
+        accessorKey: "pubkey",
         cell: (info) => (
           <div className="flex flex-col px-4">
             <div className="truncate">{`${info?.getValue()}`}</div>
@@ -68,66 +46,49 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         ),
       },
       {
-        header: () => <div className="uppercase py-2 mr-4 px-4">Liquidity</div>,
+        header: () => <div className="uppercase py-2 mr-4 px-4">Owner</div>,
         size: 30,
-        accessorKey: "liquidity",
+        accessorKey: "owner",
         cell: (info) => (
           <div className="flex flex-col px-4">
-            <div className="truncate">{`$${
-              Number(info?.getValue()).toFixed(2) ?? 0
-            }`}</div>
+            <div className="truncate">{`${info?.getValue()}`}</div>
           </div>
         ),
       },
       {
-        header: () => (
-          <div className="uppercase py-2 mr-4 px-4">Market Cap</div>
-        ),
+        header: () => <div className="uppercase py-2 mr-4 px-4">Token A</div>,
         size: 40,
-        accessorKey: "mc",
+        accessorKey: "mintA",
         cell: (info) => (
           <div className="flex flex-col px-4">
-            <div>{`$${Number(info?.getValue()).toFixed(2)}`}</div>
+            <div className="truncate">{`${info?.getValue()}`}</div>
           </div>
         ),
       },
       {
-        header: () => (
-          <div className="uppercase py-2 mr-4 px-4">24h Change</div>
-        ),
-        size: 60,
-        accessorKey: "v24hChangePercent",
+        header: () => <div className="uppercase py-2 mr-4 px-4">Token B</div>,
+        size: 40,
+        accessorKey: "mintB",
         cell: (info) => (
           <div className="flex flex-col px-4">
-            <div>{`${Number(info?.getValue()).toFixed(2)}%`}</div>
+            <div className="truncate">{`${info?.getValue()}`}</div>
           </div>
         ),
       },
-      {
-        header: () => <div className="uppercase py-2 mr-4 px-4">24h Vol</div>,
-        size: 30,
-        accessorKey: "v24hUSD",
-        cell: (info) => (
-          <div className="flex flex-col px-4">
-            <div>{`$${Number(info?.getValue()).toFixed(2)}`}</div>
-          </div>
-        ),
-      },
-      {
-        header: () => <div className="uppercase px-4">Address</div>,
-        id: "address",
-        size: 30,
-        accessorKey: "address",
-        cell: (info: any) => (
-          <div className="flex flex-col px-4">
-            <div>{getAbbreviatedAddress(info?.getValue())}</div>
-          </div>
-        ),
-      },
+      // {
+      //   header: () => <div className="uppercase py-2 mr-4 px-4">Found at</div>,
+      //   size: 40,
+      //   accessorKey: "timestamp",
+      //   cell: (info) => (
+      //     <div className="flex flex-col px-4">
+      //       <div className="truncate">{`${info?.getValue()}`}</div>
+      //     </div>
+      //   ),
+      // },
       {
         header: () => <div className="uppercase px-4"></div>,
         id: "links",
-        accessorKey: "address",
+        accessorKey: "pubkey",
 
         size: 30,
         cell: (info: any) => (
@@ -192,18 +153,11 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
             const index = props["data-index"];
             const row = rows[index];
 
-            const address = row.getVisibleCells()[6].getValue();
-
             return (
               <tr {...props}>
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} style={{ padding: "6px" }}>
-                    <Link href={`/coin/${address}`}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </Link>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
               </tr>

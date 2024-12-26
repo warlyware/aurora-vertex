@@ -14,18 +14,6 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const { data: dasData }: { data: GetTokenInfoFromDasResponse } =
-    await axios.post(`${BASE_URL}/api/get-token-info-from-das`, {
-      address,
-    });
-
-  const { data: heliusData } = await axios.post(
-    `${BASE_URL}/api/get-token-info-from-helius`,
-    {
-      address,
-    }
-  );
-
   const { data: dexscreenerData } = await axios.post(
     `${BASE_URL}/api/get-token-info-from-dexscreener`,
     {
@@ -36,8 +24,6 @@ export async function POST(req: NextRequest) {
   const { holders, total } = await getTokenHolders(address);
 
   const tokenInfo = {
-    ...dasData.asset,
-    ...heliusData,
     ...dexscreenerData,
     holders,
     holderCount: total,

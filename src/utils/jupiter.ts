@@ -84,8 +84,38 @@ export const getQuoteFromJupiter = async (
   const amount = String(baseAmount);
   const url = `https://quote-api.jup.ag/v6/quote?inputMint=${inputAddress}&outputMint=${outputAddress}&amount=${amount}&slippageBps=${
     allowedSlippageInPercent * 100
-  }`;
+  }&onlyDirectRoutes=false&platformFeeBps=60`;
   console.log({ url });
   debugger;
   return await (await fetch(url)).json();
+};
+
+export const getSerializedSwapTransaction = async (
+  quoteFromJupiter: string,
+  walletAddress: string,
+  priorityFee: number
+) => {
+  // get serialized transactions for the swap
+  const res = await (
+    await fetch("https://quote-api.jup.ag/v6/swap", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        quoteResponse: quoteFromJupiter,
+        dynamicComputeUnitLimit: true,
+        asLegacyTransaction: false,
+        userPublicKey: walletAddress,
+        wrapAndUnwrapSol: true,
+        prioritizationFeeLamports: "auto",
+        feeAccount: "HnSDrCdez8ZYUZfFBBvvy286QjVFq5PvWBAnWYbVLF1w",
+        // computeUnitPriceMicroLamports: "auto",
+      }),
+    })
+  ).json();
+
+  console.log({ res });
+
+  return res.swapTransaction;
 };

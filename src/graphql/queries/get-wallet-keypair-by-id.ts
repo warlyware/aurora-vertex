@@ -1,0 +1,14 @@
+import { gql } from "@apollo/client";
+
+export const GET_WALLET_KEYPAIR_BY_ID = gql`
+  query GET_WALLET_KEYPAIR_BY_ID($id: uuid = "") {
+    wallets_by_pk(id: $id) {
+      address
+      id
+      keypair {
+        privateKey
+        publicKey
+      }
+    }
+  }
+`;
