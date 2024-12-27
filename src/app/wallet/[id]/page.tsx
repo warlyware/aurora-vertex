@@ -8,22 +8,24 @@ import { BASE_URL } from "@/constants";
 import { useAurora } from "@/hooks";
 import { EnhancedWallet, Wallet } from "@/types";
 import { ArrowRightCircleIcon } from "@heroicons/react/24/outline";
-import { Button } from "@mui/material";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 import Link from "next/link";
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
 
 export default function WalletDetails(props: { params: Promise<any> }) {
   const params = use(props.params);
   const [wallet, setWallet] = useState<EnhancedWallet | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
   const { userWallets } = useAurora();
   const user = useUserData();
 
   const { id } = params;
 
-  const handleSetWallet = async (wallet: EnhancedWallet) => {
+  const handleSetWallet = useCallback(async (wallet: EnhancedWallet) => {
+    if (isFetching) return;
+    setIsFetching(true);
     const { data } = await axios.post(`${BASE_URL}/api/get-wallet-balances`, {
       address: wallet?.address,
     });
@@ -33,8 +35,9 @@ export default function WalletDetails(props: { params: Promise<any> }) {
       balances: data.balances,
     });
 
+    setIsFetching(false);
     setIsLoading(false);
-  };
+  }, [isFetching]);
 
   const handleTestTx = async () => {
     const { data } = await axios.post(`${BASE_URL}/api/swap-coins`, {
@@ -54,7 +57,7 @@ export default function WalletDetails(props: { params: Promise<any> }) {
         handleSetWallet(wallet);
       }
     }
-  }, [id, userWallets]);
+  }, [id, userWallets, handleSetWallet]);
 
   if (isLoading) {
     return (
@@ -117,9 +120,6 @@ export default function WalletDetails(props: { params: Promise<any> }) {
                     </div>
                   </div>
                 ))}
-                <Button onClick={handleTestTx}>
-                  Test
-                </Button>
               </div>
             )}
           </>

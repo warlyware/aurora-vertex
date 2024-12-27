@@ -4,39 +4,67 @@ import {
   Connection,
   Keypair,
   VersionedTransaction,
-  PublicKey,
-  sendAndConfirmRawTransaction,
   clusterApiUrl,
-  Transaction,
 } from "@solana/web3.js";
-import bs58 from "bs58";
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { keypairIdentity, transactionBuilder } from "@metaplex-foundation/umi";
-import { GET_WALLET_KEYPAIR_BY_ID } from "@/graphql/queries/get-wallet-keypair-by-id";
 import { client } from "@/client/backend-client";
 import { getStringFromByteArrayString } from "@/utils/solana";
 import { GET_WALLET_KEYPAIR_BY_ADDRESS } from "@/graphql/queries/get-wallet-keypair-by-address";
-import {
-  getQuoteFromJupiter,
-  getSerializedSwapTransaction,
-} from "@/utils/jupiter";
-import { getPriorityFeeEstimate } from "@/utils/fees";
+import { getSignature, Jupiter, RouteInfo, SwapResult } from '@jup-ag/core';
+import { Wallet } from "@project-serum/anchor";
+import { getQuote } from "@/utils/quote";
+import { createJupiterApiClient, QuoteGetSwapModeEnum, QuoteResponse } from "@jup-ag/api";
 import { transactionSenderAndConfirmationWaiter } from "@/utils/send-tx";
-import { Jupiter, RouteInfo, SwapResult } from '@jup-ag/core';
-import BN from 'bn.js';
-import JSBI from "jsbi";
+import { getTokenPrice } from "@/utils/token-price";
+
+const jupiterQuoteApi = createJupiterApiClient();
+
+
+async function getSwapObj(wallet: Wallet, quote: QuoteResponse) {
+  // Get serialized transaction
+  const swapObj = await jupiterQuoteApi.swapPost({
+    swapRequest: {
+      quoteResponse: quote,
+      userPublicKey: wallet.publicKey.toBase58(),
+      dynamicComputeUnitLimit: true,
+      dynamicSlippage: {
+        // This will set an optimized slippage to ensure high success rate
+        maxBps: 300, // Make sure to set a reasonable cap here to prevent MEV
+      },
+      // prioritizationFeeLamports: {
+      //     priorityLevelWithMaxLamports: {
+      //         maxLamports: 10000000,
+      //         priorityLevel: "veryHigh", // If you want to land transaction fast, set this to use `veryHigh`. You will pay on average higher priority fee.
+      //     },
+      // },
+    },
+  });
+  return swapObj;
+}
 
 export async function POST(req: NextRequest) {
-  const { amountToSwap, inputTokenAddress, outputTokenAddress, walletAddress } =
+  const { amountToSwap: amountToSwapRaw, amountToSwapInUsd, inputTokenAddress, outputTokenAddress, walletAddress, simulationOnly } =
     await req?.json();
+
+  let amountToSwap = amountToSwapRaw;
+
   console.log("POST /api/swap-coins", {
-    amountToSwap,
+    amountToSwapRaw,
+    amountToSwapInUsd,
     inputTokenAddress,
     outputTokenAddress,
     walletAddress,
+    simulationOnly
   });
+
+  if (amountToSwapInUsd && amountToSwapRaw) {
+    return NextResponse.json({
+      error: "Only one of amountToSwap or amountToSwapInUsd should be provided",
+      status: 400,
+    });
+  }
+
   if (
-    !amountToSwap ||
+    (!amountToSwapRaw && !amountToSwapInUsd) ||
     !inputTokenAddress ||
     !outputTokenAddress ||
     !walletAddress
@@ -46,15 +74,6 @@ export async function POST(req: NextRequest) {
       status: 400,
     });
   }
-
-  console.log('correct parameters');
-
-  // const inputTokenMint = new PublicKey(inputTokenAddress);
-  // const outputTokenMint = new PublicKey(outputTokenAddress);
-  // const walletPublicKey = new PublicKey(walletAddress);
-
-  // const umi = await createUmi(RPC_ENDPOINT);
-  // const umi = await createUmi("https://rpc-solana.birdeye.so/");
 
   const {
     wallets,
@@ -75,16 +94,16 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const wallet = wallets?.[0];
+  const walletFromDb = wallets?.[0];
 
-  if (!wallet?.id) {
+  if (!walletFromDb?.id) {
     return NextResponse.json({
       error: "Wallet not found",
       status: 404,
     });
   }
 
-  if (!wallet.keypair?.privateKey) {
+  if (!walletFromDb.keypair?.privateKey) {
     return NextResponse.json({
       error: "Wallet private key not found",
       status: 404,
@@ -92,78 +111,120 @@ export async function POST(req: NextRequest) {
   }
 
   const privateKey = getStringFromByteArrayString(
-    `[${wallet.keypair.privateKey}]`
+    `[${walletFromDb.keypair.privateKey}]`
   );
 
-  const byteValues = wallet.keypair.privateKey.split(",").map(Number);
+  const byteValues = walletFromDb.keypair.privateKey.split(",").map(Number);
   const buffer = Buffer.from(byteValues);
-
-  console.log('pk', { keypairPk: wallet.keypair.privateKey, privateKey });
-
   const connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
 
   const secretKey = Uint8Array.from(byteValues);
   const keypair = Keypair.fromSecretKey(secretKey);
+  const wallet = new Wallet(keypair);
+
+  let quote: QuoteResponse;
+
+  if (amountToSwapInUsd) {
+    const { rawTokenAmountPerUsd } = await getTokenPrice(outputTokenAddress);
+
+    amountToSwap = Math.floor(rawTokenAmountPerUsd * amountToSwapInUsd);
+
+    console.log('getting quote', {
+      inputTokenAddress,
+      outputTokenAddress,
+      amountToSwap
+    });
+
+    quote = await getQuote(
+      inputTokenAddress,
+      outputTokenAddress,
+      amountToSwap,
+      QuoteGetSwapModeEnum.ExactOut
+    );
+  } else {
+    quote = await getQuote(
+      inputTokenAddress,
+      outputTokenAddress,
+      amountToSwap
+    );
+  }
+
+
+  console.dir(quote, { depth: null });
+
+  const swapObj = await getSwapObj(wallet, quote);
+  console.dir(swapObj, { depth: null });
 
   console.log({ keypair });
 
   try {
-    // ------------------------------------------------------------------------
-    // 4. Load the Jupiter client
-    // ------------------------------------------------------------------------
-    const jupiter = await Jupiter.load({
-      connection,
-      cluster: 'mainnet-beta', // or 'devnet', 'testnet'
-      user: keypair,
-    });
+    // Serialize the transaction
+    const swapTransactionBuf = Buffer.from(swapObj.swapTransaction, "base64");
+    const transaction = VersionedTransaction.deserialize(new Uint8Array(swapTransactionBuf));
 
-    const ONE_USD_IN_LAMPORTS = JSBI.BigInt(1_000_000);
-    const ONE_LAMPORT_IN_LAMPORTS = JSBI.BigInt(1);
-    const ONE_PENNY_IN_LAMPORTS = JSBI.BigInt(10_000);
-    const WSOL_MINT = new PublicKey('So11111111111111111111111111111111111111112');
+    // Sign the transaction
+    transaction.sign([wallet.payer]);
+    const signature = getSignature(transaction);
 
-    const { routesInfos, cached } = await jupiter.computeRoutes({
-      // inputMint: new PublicKey(inputTokenAddress),
-      inputMint: WSOL_MINT,
-      outputMint: new PublicKey(outputTokenAddress),
-      amount: ONE_LAMPORT_IN_LAMPORTS,
-      slippageBps: 50, // 0.50% slippage
-    });
+    // We first simulate whether the transaction would be successful
+    const { value: simulatedTransactionResponse } =
+      await connection.simulateTransaction(transaction, {
+        replaceRecentBlockhash: true,
+        commitment: "processed",
+      });
+    const { err, logs } = simulatedTransactionResponse;
 
-    if (!routesInfos || routesInfos.length === 0) {
-      console.error('No viable routes found.');
-      return;
+    if (err) {
+      // Simulation error, we can check the logs for more details
+      // If you are getting an invalid account error, make sure that you have the input mint account to actually swap from.
+      console.error("Simulation Error:");
+      console.error({ err, logs });
+      return NextResponse.json({
+        error: {
+          message: err,
+          logs,
+          type: "Simulation Error",
+        },
+        status: 500,
+      });
     }
 
-    const bestRoute: RouteInfo = routesInfos[0];
-
-    const {
-      swapTransaction,
-      addressLookupTableAccounts,
-      execute,
-    } = await jupiter.exchange({
-      routeInfo: bestRoute,
-      // optionally specify which public key is doing the swap (though it can infer from bestRoute)
-      userPublicKey: keypair.publicKey,
-      wrapUnwrapSOL: true
-      // other optional fields: feeAccount, wrapUnwrapSOL, blockhashWithExpiryBlockHeight, etc.
-    });
-
-    const swapResultViaExecute: SwapResult = await execute();
-
-    if ('error' in swapResultViaExecute) {
-      // It's the failure shape
-      console.error('Swap failed:', swapResultViaExecute.error);
+    if (simulationOnly) {
+      return NextResponse.json({
+        simulation: {
+          simulatedTransactionResponse,
+          logs,
+        },
+      });
     } else {
-      // It's the success shape
-      console.log('Swap succeeded!');
-      if ('txid' in swapResultViaExecute) {
-        console.log('Transaction ID:', swapResultViaExecute.txid);
-        console.log('Input amount:', swapResultViaExecute.inputAmount);
-        console.log('Output amount:', swapResultViaExecute.outputAmount);
-      }
-    }
+      const serializedTransaction = Buffer.from(transaction.serialize());
+      const blockhash = transaction.message.recentBlockhash;
 
+      const transactionResponse = await transactionSenderAndConfirmationWaiter({
+        connection,
+        serializedTransaction,
+        blockhashWithExpiryBlockHeight: {
+          blockhash,
+          lastValidBlockHeight: swapObj.lastValidBlockHeight,
+        },
+      });
+
+      // If we are not getting a response back, the transaction has not confirmed.
+      if (!transactionResponse) {
+        console.error("Transaction not confirmed");
+        return;
+      }
+
+      if (transactionResponse.meta?.err) {
+        console.error(transactionResponse.meta?.err);
+      }
+
+      console.log(`https://solscan.io/tx/${signature}`);
+
+      return NextResponse.json({
+        signature,
+      });
+    }
   }
 
   catch (error: any) {
@@ -173,63 +234,4 @@ export async function POST(req: NextRequest) {
       status: 500,
     });
   }
-
-  // const keypair = Keypair.fromSecretKey(buffer);
-
-  // const quote = await getQuoteFromJupiter(
-  //   amountToSwap,
-  //   outputTokenAddress === "SOL" ? SOL_TOKEN_ADDRESS : outputTokenAddress,
-  //   inputTokenAddress === "SOL" ? SOL_TOKEN_ADDRESS : inputTokenAddress,
-  //   0.5
-  // );
-
-  // const feeEstimate = await getPriorityFeeEstimate();
-
-  // const tx = await getSerializedSwapTransaction(
-  //   quote,
-  //   walletAddress,
-  //   feeEstimate
-  // );
-
-  // console.log({ feeEstimate, tx });
-
-  // const swapTransactionBuf = Buffer.from(tx, "base64");
-  // var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
-
-  // console.log(transaction);
-  // transaction.sign([keypair]);
-
-  // const connection = new Connection(RPC_ENDPOINT);
-
-  // const { blockhash, lastValidBlockHeight } =
-  //   await umi.rpc.getLatestBlockhash();
-
-  // const rawTransaction = transaction.serialize();
-  // try {
-  //   const signature = await connection.sendRawTransaction(rawTransaction, {
-  //     skipPreflight: true,
-  //     maxRetries: 2,
-  //   });
-
-  //   const confirmation = await connection.confirmTransaction(
-  //     {
-  //       signature,
-  //       blockhash,
-  //       lastValidBlockHeight,
-  //     },
-  //     "confirmed"
-  //   );
-
-  //   console.log({ confirmation });
-
-  //   return NextResponse.json({
-  //     signature,
-  //   });
-  // } catch (error: any) {
-  //   console.error(error);
-  //   return NextResponse.json({
-  //     error: error?.message,
-  //     status: 500,
-  //   });
-  // }
 }

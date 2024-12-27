@@ -79,3 +79,6 @@ export const createEnhancedWallet = (wallet: Wallet): EnhancedWallet => {
     },
   };
 };
+
+export const wait = (time: number) =>
+  new Promise((resolve) => setTimeout(resolve, time));

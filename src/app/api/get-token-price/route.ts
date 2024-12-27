@@ -1,41 +1,22 @@
+import { getTokenPrice } from "@/utils/token-price";
 import { NextRequest, NextResponse } from "next/server";
 
-type GetTokenPriceInput = {
-  address: string;
-};
-
-export type BirdEyeTokenPriceResponse = {
-  value: number;
-  updateUnixTime: number;
-  updateHumanTime: string;
-};
 
 export async function POST(req: NextRequest) {
-  if (!process.env.BIRDEYE_API_KEY) {
-    return NextResponse.json({
-      status: 500,
-      body: {
-        error: "BIRDEYE_API_KEY is not defined in .env",
-      },
-    });
-  }
+  const { tokenAddress } =
+    await req?.json();
 
-  const body: GetTokenPriceInput = await req?.json();
+  console.log({
+    tokenAddress,
+  })
 
-  const birdeyeResponse = await fetch(
-    `https://public-api.birdeye.so/defi/price?address=${body.address}`,
-    {
-      headers: {
-        "X-API-KEY": `${process.env.BIRDEYE_API_KEY}`,
-      },
-    }
-  );
-
-  const { data }: { data: BirdEyeTokenPriceResponse } =
-    await birdeyeResponse.json();
+  const { price, rawTokenAmountPerUsd } = await getTokenPrice(tokenAddress);
 
   return NextResponse.json({
     status: 200,
-    ...data,
+    data: {
+      price,
+      rawTokenAmountPerUsd
+    }
   });
 }

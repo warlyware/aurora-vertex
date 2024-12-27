@@ -14,8 +14,8 @@ export const Header = () => {
         <Link href="/dashboard" className="mr-8">
           aurora vertex
         </Link>
-        <Link href="/dashboard">coins</Link>
-        <Link href="/wallet">wallets</Link>
+        <Link href="/wallet">my wallets</Link>
+        <Link href="/wallet-watchlist">watched wallets</Link>
         <div className="flex-1"></div>
         <div className="flex items-center">
           {isLoadingActiveWallet ? (
