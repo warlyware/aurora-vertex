@@ -59,7 +59,6 @@
     "notistack": "^3.0.1",
     "pino-pretty": "^10.3.0",
     "promise-retry": "^2.0.1",
-    "puppeteer": "^21.6.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-hot-toast": "^2.4.1",
