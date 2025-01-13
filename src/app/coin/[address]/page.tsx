@@ -1,18 +1,12 @@
 "use client";
 import { GetTokenInfoFromDasResponse } from "@/app/api/get-token-info-from-das/route";
 import { GetTokenInfoFromDexscreenerResponse } from "@/app/api/get-token-info-from-dexscreener/route";
-import { CopyToClipboardButton } from "@/components/UI/buttons/copy-to-clipboard-button";
-import { Header } from "@/components/UI/header";
 import { PageWrapper } from "@/components/UI/page-wrapper";
-import Spinner from "@/components/UI/spinner";
 import { TokenLinks } from "@/components/tokens/token-links";
 import { BASE_URL } from "@/constants";
 import { HolderFromSolscan } from "@/types/solscan";
-import { getAbbreviatedAddress } from "@/utils";
-import { addCommasToNumber, truncateDescription } from "@/utils/formatting";
-import { useUserData } from "@nhost/nextjs";
+import { addCommasToNumber, } from "@/utils/formatting";
 import axios from "axios";
-import Image from "next/image";
 import { useCallback, useEffect, useState, use } from "react";
 
 type CoinInfo = GetTokenInfoFromDasResponse &
@@ -23,7 +17,6 @@ type CoinInfo = GetTokenInfoFromDasResponse &
 
 export default function CoinDetailPage(props: { params: Promise<any> }) {
   const params = use(props.params);
-  const user = useUserData();
   const { address } = params;
   const [coin, setCoin] = useState<CoinInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,39 +36,9 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
 
   return (
     <>
-      {!!user?.id && <Header />}
-      {isLoading && (
-        <div className="pt-48">
-          <Spinner />
-        </div>
-      )}
       <PageWrapper>
         {!!coin && (
           <div className="flex w-full h-full max-w-5xl">
-            {/* <div className="w-1/2 h-full flex flex-col justify-center items-center px-4">
-              <Image
-                src={coin.imageUrl}
-                alt={`${coin.name} logo`}
-                width={200}
-                height={200}
-                className="rounded-full block"
-              />
-              {!!coin?.symbol && (
-                <div className="text-4xl my-4">
-                  {coin.symbol.startsWith("$")
-                    ? coin.symbol
-                    : `$${coin.symbol}`}
-                </div>
-              )}
-              <div className="mb-4">{coin.name}</div>
-              <div className="mb-4 flex items-center space-x-2">
-                <div>{getAbbreviatedAddress(coin.address)}</div>
-                <CopyToClipboardButton text={address} />
-              </div>
-              <div className="mb-4 italic max-w-sm">
-                {truncateDescription(coin.description)}
-              </div>
-            </div> */}
             <div className="w-1/2 h-full flex flex-col justify-center px-4">
               <div className="mb-4 pt-16">
                 Holders: {addCommasToNumber(coin.holderCount)}
@@ -101,15 +64,6 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
                   Locked supply: {addCommasToNumber(coin.lockedSupply)}
                 </div>
               )}
-              {/* <div className="mb-4">
-                Writable: {coin.isWritable ? "Yes" : "No"}
-              </div>
-              <div className="mb-4">
-                Mint Authority: {coin.mintAuthority || "None"}
-              </div>
-              <div className="mb-4">
-                Freeze Authority: {coin.freezeAuthority || "None"}
-              </div> */}
               <div className="flex">
                 {!!coin.website?.url && (
                   <div className="mb-4 mr-4">

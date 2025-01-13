@@ -1,0 +1,147 @@
+"use client";
+import { useCallback, useEffect, useState } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import { AURORA_VERTEX_WS_URL, BASE_URL, SOL_TOKEN_ADDRESS } from "@/constants";
+import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
+import { TelegramMessageList, TgMessagesForDisplay } from "@/components/telegram/TelegramMessageList";
+import { TelegramChannelList } from "@/components/telegram/TelegramChannelList";
+import { WsHeader } from "@/components/UI/ws-header";
+
+const SENDERS = {
+  'GMGN Sniper Bot': 7141128298,
+};
+
+export default function WebSocketComponent() {
+  const { sendMessage, lastMessage, readyState } = useWebSocket(
+    `${AURORA_VERTEX_WS_URL}`
+  );
+  const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
+  const [latencyInMs, setLatencyInMs] = useState(0);
+  const [tgMessagesForDisplay, setTgMessagesForDisplay] = useState<TgMessagesForDisplay>({});
+  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+
+  const {
+    PING,
+    PONG,
+    TG_GET_ME,
+    TG_CHAT_MESSAGE,
+  } = messageTypes;
+
+  const setupKeepAlive = useCallback(() => {
+    setInterval(() => {
+      sendMessage(
+        JSON.stringify({
+          type: PING,
+          payload: {
+            timestamp: Date.now(),
+          },
+        })
+      );
+    }, 10000);
+
+    setHasSetupKeepAlive(true);
+  }, [sendMessage, PING]);
+
+  const handlePlaySound = async () => {
+    const sound = new Audio(`${BASE_URL}/sounds/level-up.wav`);
+    sound.play();
+  };
+
+  const handleMessageData = useCallback(
+    async ({ type, payload }: AuroraMessage) => {
+      switch (type) {
+        case TG_GET_ME:
+          console.log("TG_GET_ME", payload);
+          break;
+        case TG_CHAT_MESSAGE:
+          console.log("TG_CHAT_MESSAGE", payload);
+
+          if (payload.chatId === SENDERS['GMGN Sniper Bot']) {
+            handlePlaySound();
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            handlePlaySound();
+          }
+
+          setTgMessagesForDisplay((prev) => {
+            const chatId = payload.chatId;
+            const newMessage = {
+              title: payload.chat.title,
+              chat: payload.chat,
+              chatId: payload.chatId,
+              messageId: payload.messageId,
+              text: payload.text,
+              timestamp: payload.formattedTimestamp,
+              rawMessage: payload,
+              rawChat: payload.chat,
+              sender: payload.sender,
+            };
+
+            if (!prev[chatId]) {
+              return { ...prev, [chatId]: [newMessage] };
+            }
+
+            const existingMessages = prev[chatId]
+
+            if (existingMessages.some((m) => m.messageId === newMessage.messageId)) {
+              // If already there, do nothing
+              return prev;
+            }
+
+            return {
+              ...prev,
+              [chatId]: [...existingMessages, newMessage].filter((message) =>
+                message.sender?.usernames?.active_usernames?.[0] !== 'safeguard'
+                && message.sender?.usernames?.active_usernames?.[0] !== 'MissRose_bot'
+                && !message?.text?.includes("Due to increased spam messages and bot activity")
+              ),
+            };
+          });
+          break;
+        case PONG:
+          setLatencyInMs(Date.now() - payload.timestamp);
+          break;
+        default:
+          console.log('UNKNOWN MESSAGE TYPE', type, payload);
+          break;
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  useEffect(() => {
+    if (readyState === ReadyState.OPEN && !hasSetupKeepAlive) {
+      setupKeepAlive();
+    }
+  }, [hasSetupKeepAlive, readyState, setupKeepAlive]);
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      handleMessageData(JSON.parse(lastMessage.data));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastMessage]);
+
+  return (
+    <>
+      <WsHeader
+        latencyInMs={latencyInMs}
+        tgMessagesCount={Object.values(tgMessagesForDisplay).reduce((acc, val) => acc + val.length, 0)}
+        sendMessage={sendMessage}
+        handlePlaySound={handlePlaySound}
+      />
+
+      <div className="w-full mx-auto flex">
+        <TelegramChannelList
+          tgMessagesForDisplay={tgMessagesForDisplay}
+          selectedChatId={selectedChatId}
+          setSelectedChatId={setSelectedChatId}
+        />
+        <TelegramMessageList
+          tgMessagesForDisplay={tgMessagesForDisplay}
+          selectedChatId={selectedChatId}
+        />
+      </div>
+    </>
+  );
+}
