@@ -1,6 +1,7 @@
 import { ChatBubbleBottomCenterIcon, ClipboardIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import Image from "next/image";
+import JSONPretty from 'react-json-pretty';
 
 export const TelegramMessage = (
   { message }: {
@@ -38,7 +39,8 @@ export const TelegramMessage = (
             </div>
           )}
 
-          <div className="mb-4 text-gray-100">{text}</div>
+          <JSONPretty data={message?.text} />
+
           <div className="flex mb-2 text-xs space-x-4 text-gray-300">
             <div className="mb-4">{timestamp}</div>
             <div className="mb-2">ID: {messageId}</div>
@@ -85,6 +87,24 @@ export const TelegramMessage = (
           //   </div>
           // </div>
         )}
+      <ul className="pb-6">
+        {message?.rawMessage?.rawMessage?.content?.text?.entities?.filter(
+          (entity: any) => entity.type._ === 'textEntityTypeTextUrl'
+        )
+          .map((entity: any) => (
+            <li key={entity.offset}>
+              <a
+                href={entity.type.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-400 hover:underline"
+              >
+                {entity.type.url}
+              </a>
+            </li>
+          ))}
+        {/* <JSONPretty data={message.rawMessage?.content?.text?.entities} /> */}
+      </ul >
     </>
   )
 }

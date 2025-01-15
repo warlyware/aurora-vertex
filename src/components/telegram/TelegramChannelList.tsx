@@ -10,8 +10,8 @@ export const TelegramChannelList = (
 ) => {
   return (
     <div className="flex flex-col w-1/4 h-[calc(100vh-64px)]">
-      <div className="w-full rounded-lg h-full overflow-y-auto  px-4">
-        <div className="flex flex-col space-y-4 bg-sky-600 rounded-lg bg-opacity-20 h-full p-4">
+      <div className="w-full h-full overflow-y-auto bg-sky-600 rounded-lg bg-opacity-20 px-4 ml-4">
+        <div className="flex flex-col space-y-4 h-full p-4">
           {tgMessagesForDisplay && Object.keys(tgMessagesForDisplay).map((chatId) => (
             <button
               key={chatId}

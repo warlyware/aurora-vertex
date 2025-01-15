@@ -6,10 +6,16 @@ import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
 import { TelegramMessageList, TgMessagesForDisplay } from "@/components/telegram/TelegramMessageList";
 import { TelegramChannelList } from "@/components/telegram/TelegramChannelList";
 import { WsHeader } from "@/components/UI/ws-header";
+import JSONPretty from "react-json-pretty";
 
 const SENDERS = {
   'GMGN Sniper Bot': 7141128298,
 };
+
+const CHANNEL_IDS = {
+  'Call Analyzer 2': -1001914959004,
+  'GMGN Alerts': 6917338381,
+}
 
 export default function WebSocketComponent() {
   const { sendMessage, lastMessage, readyState } = useWebSocket(
@@ -19,6 +25,7 @@ export default function WebSocketComponent() {
   const [latencyInMs, setLatencyInMs] = useState(0);
   const [tgMessagesForDisplay, setTgMessagesForDisplay] = useState<TgMessagesForDisplay>({});
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const [scrapedChannels, setScrapedChannels] = useState<any[]>([]);
 
   const {
     PING,
@@ -61,6 +68,37 @@ export default function WebSocketComponent() {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             handlePlaySound();
           }
+
+          console.log("CHANNEL_IDS['Call Analyzer 2']", payload);
+
+          const scrapedUrls = payload?.textEntities?.filter(
+            (entity: any) => entity.type._ === 'textEntityTypeTextUrl'
+          )
+
+          console.log('scrapedUrls', scrapedUrls);
+
+          const channelUrl = scrapedUrls[0]?.type?.url;
+
+          const title = scrapedUrls[0]?.type?.url.split('/').slice(-2, -1)[0];
+
+          const toAdd = {
+            id: payload.chatId,
+            title,
+            url: channelUrl,
+          };
+
+          scrapedChannels.forEach((channel) => {
+            if (channel.id === toAdd.id) {
+              return;
+            }
+          });
+
+          setScrapedChannels((prev) => {
+            return [
+              ...prev,
+              toAdd,
+            ];
+          })
 
           setTgMessagesForDisplay((prev) => {
             const chatId = payload.chatId;
@@ -138,9 +176,24 @@ export default function WebSocketComponent() {
           setSelectedChatId={setSelectedChatId}
         />
         <TelegramMessageList
+          title={selectedChatId ? tgMessagesForDisplay?.[selectedChatId]?.[0]?.chat?.title : ''}
           tgMessagesForDisplay={tgMessagesForDisplay}
           selectedChatId={selectedChatId}
         />
+        <div className="absolute bottom-8 rounded right-12 h-96 w-64 bg-sky-900 border border-gray-300 overflow-y-auto p-4">
+          <ul>
+            {scrapedChannels
+              // remove duplicates
+              .filter((channel, index, self) => self.findIndex((t) => t.title === channel.title) === index)
+              .map((channel) => (
+                <li key={channel.id} className="text-white">
+                  <a href={channel.url} key={channel.id} target="_blank" rel="noreferrer">
+                    {channel.title}
+                  </a>
+                </li>
+              ))}
+          </ul>
+        </div>
       </div>
     </>
   );

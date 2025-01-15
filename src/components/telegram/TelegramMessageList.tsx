@@ -32,13 +32,15 @@ export type TgMessagesForDisplay = {
 };
 
 export const TelegramMessageList = (
-  { tgMessagesForDisplay, selectedChatId }: {
+  { tgMessagesForDisplay, selectedChatId, title }: {
     tgMessagesForDisplay: any;
     selectedChatId: number | null;
+    title: string;
   }
 ) => {
   return (
-    <div className="flex flex-col mr-4 w-3/4 rounded-lg h-[calc(100vh-64px)] overflow-y-auto bg-sky-600 bg-opacity-20 p-4">
+    <div className="flex flex-col ml-8 mr-4 w-3/4 rounded-lg h-[calc(100vh-64px)] overflow-y-auto bg-sky-600 bg-opacity-20 p-4">
+      <div className="my-4 font-bold">{title} {selectedChatId}</div>
       {!!selectedChatId && [...tgMessagesForDisplay[selectedChatId]]
         .reverse()
         .map((message) => (
