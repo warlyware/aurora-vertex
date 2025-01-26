@@ -6,8 +6,6 @@ import { useCallback, useEffect, useState, use } from "react";
 import JSONPretty from "react-json-pretty";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 
-type CoinInfo = any;
-
 export default function CoinDetailPage(props: { params: Promise<any> }) {
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     `${AURORA_VERTEX_WS_URL}`
@@ -16,10 +14,8 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
   const params = use(props.params);
   const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
   const [latencyInMs, setLatencyInMs] = useState(0);
-  const [coin, setCoin] = useState<CoinInfo | null>(null);
 
   const {
-    GET_COIN_INFO,
     PING,
     PONG,
   } = messageTypes;
@@ -42,10 +38,6 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
   const handleMessageData = useCallback(
     async ({ type, payload }: AuroraMessage) => {
       switch (type) {
-        case GET_COIN_INFO:
-          console.log("Received coin info", payload);
-          setCoin(payload);
-          break;
         case PONG:
           const latency = Date.now() - payload.timestamp;
           setLatencyInMs(latency);
@@ -56,18 +48,6 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-  const requestCoinInfo = useCallback(async () => {
-    sendMessage(
-      JSON.stringify({
-        type: GET_COIN_INFO,
-        payload: {
-          address: params.address,
-        },
-      })
-    )
-
-  }, [params?.address, sendMessage, GET_COIN_INFO]);
 
   useEffect(() => {
     if (readyState === ReadyState.OPEN && !hasSetupKeepAlive) {
@@ -81,17 +61,11 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
     }
   }, [lastMessage, handleMessageData]);
 
-  useEffect(() => {
-    if (params?.address && readyState === ReadyState.OPEN && !coin) {
-      requestCoinInfo();
-    }
-  }, [params?.address, readyState, requestCoinInfo, coin]);
-
   return (
     <>
       <PageWrapper>
-        latency: {latencyInMs}ms
-        <JSONPretty data={coin} />
+        {latencyInMs}
+        <JSONPretty data={lastMessage} />
       </PageWrapper>
     </>
   );
