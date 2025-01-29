@@ -76,8 +76,12 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
   }, [hasSetupKeepAlive, readyState, setupKeepAlive]);
 
   useEffect(() => {
-    if (lastMessage !== null) {
-      handleMessageData(JSON.parse(lastMessage.data));
+    if (lastMessage?.data) {
+      console.log("Received message", lastMessage);
+      try {
+        handleMessageData(JSON.parse(lastMessage.data));
+      }
+      catch (e) { }
     }
   }, [lastMessage, handleMessageData]);
 

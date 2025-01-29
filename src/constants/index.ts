@@ -13,5 +13,7 @@ export const JUPITER_TOKEN_LIST_STRICT_URL = "https://token.jup.ag/strict";
 export const AURORA_VERTEX_API_URL = process.env
   .NEXT_PUBLIC_AURORA_VERTEX_API_URL as string;
 export const AURORA_VERTEX_WS_URL = 'http://localhost:3002';
+// export const AURORA_VERTEX_WS_URL = 'wss://api.auroravertex.click';
 // export const AURORA_VERTEX_WS_URL = process.env
 //   .NEXT_PUBLIC_AURORA_VERTEX_WS_URL as string;
+

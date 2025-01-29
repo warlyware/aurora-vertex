@@ -14,8 +14,10 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
   const params = use(props.params);
   const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
   const [latencyInMs, setLatencyInMs] = useState(0);
+  const [notifications, setNotifications] = useState<AuroraMessage[]>([]);
 
   const {
+    SOLANA_ACCOUNT_NOTIFICATION,
     PING,
     PONG,
   } = messageTypes;
@@ -42,6 +44,10 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
           const latency = Date.now() - payload.timestamp;
           setLatencyInMs(latency);
           break;
+
+        case SOLANA_ACCOUNT_NOTIFICATION:
+          setNotifications((prev) => [...prev, { type, payload }]);
+          break;
         default:
           console.log("Unhandled message type", type);
           break;
@@ -57,9 +63,7 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
 
   useEffect(() => {
     if (lastMessage !== null) {
-      try {
-        handleMessageData(JSON.parse(lastMessage.data));
-      } catch (e) { }
+      handleMessageData(JSON.parse(lastMessage.data));
     }
   }, [lastMessage, handleMessageData]);
 
@@ -67,7 +71,7 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
     <>
       <PageWrapper>
         {latencyInMs}
-        <JSONPretty data={lastMessage} />
+        <JSONPretty data={notifications} />
       </PageWrapper>
     </>
   );
