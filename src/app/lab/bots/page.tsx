@@ -109,7 +109,7 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
     <>
       <PageWrapper>
         <div className="flex space-x-2">
-          <div className="flex flex-col space-x-4 mb-8 p-2 px-4 bg-sky-950 rounded-lg">
+          <div className="flex flex-col space-x-4 p-2 px-4 bg-sky-950 rounded-lg">
             <div className="flex space-x-2">
               <div className="font-bold">HAMBURG</div>
               <button
@@ -125,8 +125,8 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
             </div>
             <JSONPretty data={botStatus['HAMBURG']} />
           </div>
-          <div className="flex flex-col space-x-4 mb-8 p-2 px-4 bg-yellow-950 rounded-lg">
-            <div className="flex space-x-2 mb-2">
+          <div className="flex flex-col space-x-4 p-2 px-4 bg-yellow-950 rounded-lg">
+            <div className="flex space-x-2">
               <div className="font-bold">BILBO</div>
               <button
                 onClick={spawnBot("BILBO")}
@@ -139,12 +139,8 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
                 stop
               </button>
             </div>
-            <div className="">
-              <div>status</div>
-
-            </div>
           </div>
-          <div className="flex flex-col space-x-4 mb-8 p-2 px-4 bg-green-950 rounded-lg">
+          <div className="flex flex-col space-x-4 p-2 px-4 bg-green-950 rounded-lg">
             <div className="flex space-x-2">
               <div className="font-bold">BERTRAND</div>
               <button
@@ -158,7 +154,6 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
                 stop
               </button>
             </div>
-            <div>status</div>
           </div>
         </div>
 
