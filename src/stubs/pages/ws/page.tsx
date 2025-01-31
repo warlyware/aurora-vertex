@@ -1,5 +1,7 @@
 "use client";
-import { PageWrapper } from "@/components/UI/page-wrapper";
+import Spinner from "@/components/UI/spinner";
+import WsContentWrapper from "@/components/UI/ws-content-wrapper";
+import WsPageWrapper from "@/components/UI/ws-page-wrapper";
 import { AURORA_VERTEX_WS_URL, BASE_URL } from "@/constants";
 import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
 import { useCallback, useEffect, useState, use } from "react";
@@ -11,36 +13,20 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
     `${AURORA_VERTEX_WS_URL}`
   );
 
+  const [hasBeenInitialized, setHasBeenInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
   const params = use(props.params);
-  const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
-  const [latencyInMs, setLatencyInMs] = useState(0);
 
   const {
     PING,
     PONG,
   } = messageTypes;
 
-  const setupKeepAlive = useCallback(() => {
-    setInterval(() => {
-      sendMessage(
-        JSON.stringify({
-          type: PING,
-          payload: {
-            timestamp: Date.now(),
-          },
-        })
-      );
-    }, 10000);
-
-    setHasSetupKeepAlive(true);
-  }, [sendMessage, PING]);
-
   const handleMessageData = useCallback(
     async ({ type, payload }: AuroraMessage) => {
       switch (type) {
         case PONG:
-          const latency = Date.now() - payload.timestamp;
-          setLatencyInMs(latency);
           break;
         default:
           console.log("Unhandled message type", type);
@@ -50,10 +36,13 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
     }, []);
 
   useEffect(() => {
-    if (readyState === ReadyState.OPEN && !hasSetupKeepAlive) {
-      setupKeepAlive();
+    if (readyState === ReadyState.OPEN && !hasBeenInitialized) {
+      setTimeout(() => {
+        setIsLoading(false);
+        setHasBeenInitialized(true);
+      }, 500);
     }
-  }, [hasSetupKeepAlive, readyState, setupKeepAlive]);
+  }, [hasBeenInitialized, readyState]);
 
   useEffect(() => {
     if (lastMessage !== null) {
@@ -65,10 +54,17 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
 
   return (
     <>
-      <PageWrapper>
-        {latencyInMs}
-        <JSONPretty data={lastMessage} />
-      </PageWrapper>
+      <div className="flex w-full">
+        {isLoading ? <div className="pt-32 w-full flex justify-center">
+          <Spinner />
+        </div> : (
+          <WsPageWrapper>
+            <WsContentWrapper>
+              <JSONPretty data={lastMessage} />
+            </WsContentWrapper>
+          </WsPageWrapper>
+        )}
+      </div>
     </>
   );
 }

@@ -1,5 +1,7 @@
 export const getSolscanTokenUrl = (address: string) =>
   `https://solscan.io/token/${address}`;
+export const getSolscanTxUrl = (address: string) =>
+  `https://solscan.io/tx/${address}`;
 export const getBirdEyeTokenUrl = (address: string) =>
   `https://birdeye.so/token/${address}?chain=solana`;
 export const getSolanaFmTokenUrl = (address: string) =>

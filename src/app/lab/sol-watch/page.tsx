@@ -14,10 +14,10 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
   const params = use(props.params);
   const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
   const [latencyInMs, setLatencyInMs] = useState(0);
-  const [notifications, setNotifications] = useState<AuroraMessage[]>([]);
+  const [solanaTxNotifications, setSolanaTxNotifications] = useState<AuroraMessage[]>([]);
 
   const {
-    SOLANA_ACCOUNT_NOTIFICATION,
+    SOLANA_TX_NOTIFICATION,
     PING,
     PONG,
   } = messageTypes;
@@ -45,8 +45,8 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
           setLatencyInMs(latency);
           break;
 
-        case SOLANA_ACCOUNT_NOTIFICATION:
-          setNotifications((prev) => [...prev, { type, payload }]);
+        case SOLANA_TX_NOTIFICATION:
+          setSolanaTxNotifications((prev) => [...prev, { type, payload }]);
           break;
         default:
           console.log("Unhandled message type", type);
@@ -71,7 +71,7 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
     <>
       <PageWrapper>
         {latencyInMs}
-        <JSONPretty data={notifications} />
+        <JSONPretty data={solanaTxNotifications} />
       </PageWrapper>
     </>
   );

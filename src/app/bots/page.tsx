@@ -1,61 +1,67 @@
 "use client";
-import { PageWrapper } from "@/components/UI/page-wrapper";
+import { BotMessage } from "@/components/bots/bot-message";
+import { BotStatus } from "@/components/bots/bot-status";
+import { SolanaTxNotification } from "@/components/solana/SolanaTxNotification";
+import Spinner from "@/components/UI/spinner";
+import WsContentWrapper from "@/components/UI/ws-content-wrapper";
+import WsPageWrapper from "@/components/UI/ws-page-wrapper";
 import { AURORA_VERTEX_WS_URL, BASE_URL } from "@/constants";
+import { SolanaTxNotificationType } from "@/types/helius";
 import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
-import { useCallback, useEffect, useState, use } from "react";
-import JSONPretty from "react-json-pretty";
+import { EyeIcon, EyeSlashIcon, PowerIcon } from "@heroicons/react/24/outline";
+import classNames from "classnames";
+import { useCallback, useEffect, useState, use, useMemo } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 
-export default function CoinDetailPage(props: { params: Promise<any> }) {
+export default function Page(props: { params: Promise<any> }) {
   const { sendMessage, lastMessage, readyState } = useWebSocket(
     `${AURORA_VERTEX_WS_URL}`
   );
 
-  const params = use(props.params);
-  const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
-  const [latencyInMs, setLatencyInMs] = useState(0);
-  const [botMessages, setBotMessages] = useState<any[]>([]);
+  const bots = useMemo(() => ['SAMWISE', 'BILBO', 'FRODO'], []);
+
+  const [hasBeenInitialized, setHasBeenInitialized] = useState(false);
+  const [botLogs, setBotLogs] = useState<any[]>([]);
+  const [visibleBotLogs, setVisibleBotLogs] = useState<any[]>([]);
+  const [visibleLogBotIds, setVisibleLogBotIds] = useState<string[]>([]);
   const [botStatus, setBotStatus] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [solanaTxNotifications, setSolanaTxNotifications] = useState<SolanaTxNotificationType[]>([]);
 
   const {
-    PING,
     BOT_NOTIFICATION,
     BOT_SPAWN,
     BOT_STOP,
-    BOT_STATUS
+    BOT_STATUS,
+    BOT_TRADE_NOTIFICATION,
+    SOLANA_TX_NOTIFICATION
   } = messageTypes;
 
-  const setupKeepAlive = useCallback(() => {
-    setInterval(() => {
-      sendMessage(
-        JSON.stringify({
-          type: PING,
-          payload: {
-            timestamp: Date.now(),
-          },
-        })
-      );
-    }, 10000);
-
-    setHasSetupKeepAlive(true);
-  }, [sendMessage, PING]);
-
   const handleMessageData = useCallback(
-    async ({ type, payload }: AuroraMessage) => {
-      console.log("Received message", type, payload);
+    async ({ type, payload }: AuroraMessage | SolanaTxNotificationType) => {
+
+      console.log('handleMessageData', type);
+      if (type === SOLANA_TX_NOTIFICATION) {
+        console.log('SOLANA_TX_NOTIFICATION received', payload?.params?.result?.signature);
+      }
+
       switch (type) {
         case BOT_NOTIFICATION:
-          console.log("Received bot message", payload);
-          setBotMessages((prev) => [...prev, payload]);
+          setBotLogs((prev) => [...prev, payload]);
+          break;
+        case BOT_TRADE_NOTIFICATION:
+          setBotLogs((prev) => [...prev, payload]);
           break;
         case BOT_STATUS:
-          console.log("Received bot status", payload);
           setBotStatus(
             (prev: any) => ({
               ...prev,
-              [payload.botId]: payload.status,
+              [payload.botId]: payload,
             })
           );
+          break;
+        case SOLANA_TX_NOTIFICATION:
+          setSolanaTxNotifications((prev) => [...prev, { type, payload } as SolanaTxNotificationType]);
           break;
         default:
           console.log("Unhandled message type", type);
@@ -92,10 +98,20 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
   );
 
   useEffect(() => {
-    if (readyState === ReadyState.OPEN && !hasSetupKeepAlive) {
-      setupKeepAlive();
+    if (readyState === ReadyState.OPEN && !hasBeenInitialized) {
+      setTimeout(() => {
+        setIsLoading(false);
+        setVisibleLogBotIds(bots);
+        setHasBeenInitialized(true);
+      }, 500);
     }
-  }, [hasSetupKeepAlive, readyState, setupKeepAlive]);
+  }, [hasBeenInitialized, readyState, botLogs, bots, visibleLogBotIds]);
+
+  useEffect(() => {
+    setVisibleBotLogs(
+      botLogs.filter((log) => visibleLogBotIds.includes(log.botId))
+    );
+  }, [botLogs, visibleLogBotIds]);
 
   useEffect(() => {
     if (lastMessage !== null) {
@@ -107,69 +123,99 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
 
   return (
     <>
-      <PageWrapper>
-        <div className="flex space-x-2">
-          <div className="flex flex-col space-x-4 mb-8 p-2 px-4 bg-sky-950 rounded-lg">
-            <div className="flex space-x-2">
-              <div className="font-bold">HAMBURG</div>
-              <button
-                onClick={spawnBot("HAMBURG")}
+      <div className="flex w-full">
+        {isLoading ? <div className="pt-32 w-full flex justify-center">
+          <Spinner />
+        </div> : (
+          <WsPageWrapper>
+            <WsContentWrapper
+              className="flex w-full"
+            >
+              <div
+                className="flex flex-col w-[440px] gap-x-2 gap-y-4 h-screen overflow-y-auto p-4"
               >
-                start
-              </button>
-              <button
-                onClick={stopBot("HAMBURG")}
-              >
-                stop
-              </button>
-            </div>
-            <JSONPretty data={botStatus['HAMBURG']} />
-          </div>
-          <div className="flex flex-col space-x-4 mb-8 p-2 px-4 bg-yellow-950 rounded-lg">
-            <div className="flex space-x-2 mb-2">
-              <div className="font-bold">BILBO</div>
-              <button
-                onClick={spawnBot("BILBO")}
-              >
-                start
-              </button>
-              <button
-                onClick={stopBot("BILBO")}
-              >
-                stop
-              </button>
-            </div>
-            <div className="">
-              <div>status</div>
+                <div className="flex">
+                  <button
+                    className="bg-sky-900 text-white p-2 rounded-lg w-full"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        solanaTxNotifications
+                          .map((notification) => JSON.stringify(notification))
+                          .join("\n")
+                      );
+                    }}
+                  >
+                    copy intercepted txs
+                  </button>
+                </div>
 
-            </div>
-          </div>
-          <div className="flex flex-col space-x-4 mb-8 p-2 px-4 bg-green-950 rounded-lg">
-            <div className="flex space-x-2">
-              <div className="font-bold">BERTRAND</div>
-              <button
-                onClick={spawnBot("BERTRAND")}
-              >
-                start
-              </button>
-              <button
-                onClick={stopBot("BERTRAND")}
-              >
-                stop
-              </button>
-            </div>
-            <div>status</div>
-          </div>
-        </div>
+                {bots
+                  .map((botId) => (
+                    <div key={botId} className="w-full p-2 px-4 bg-sky-950 rounded-lg">
+                      <div className="flex justify-between space-x-2 mb-2 items-center">
+                        <div className="flex">
+                          {/* need to add check for ping timeout */}
+                          <div className="flex items-center">{botStatus[botId]?.isActive ?
+                            <div className="bg-green-600 h-3 w-3 rounded-full shadow-inner" /> :
+                            <div className="bg-red-600 h-3 w-3 rounded-full shadow-inner" />
+                          }</div>
+                          <div className="font-bold ml-2">{botId}</div>
+                        </div>
+                        <div className="flex space-x-2 items-center">
+                          <button
+                            className={classNames([
+                              "h-4 w-4",
+                              botLogs.some((log) => log.botId === botId) ? "" : "text-gray-500",
+                            ])}
+                            onClick={
+                              () => {
+                                setVisibleLogBotIds((prev) => {
+                                  if (prev.includes(botId)) {
+                                    return prev.filter((id) => id !== botId);
+                                  } else {
+                                    return [...prev, botId];
+                                  }
+                                });
+                              }
+                            }
+                          >
+                            {
+                              visibleBotLogs.some((log) => log.botId === botId) ? <EyeIcon className="h-4 w-4" /> : <EyeSlashIcon className="h-4 w-4" />
+                            }
+                          </button>
+                          <button
+                            onClick={
+                              botStatus[botId]?.isActive ? stopBot(botId) : spawnBot(botId)
+                            }
+                          >
+                            <PowerIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                      <BotStatus status={botStatus[botId]} />
+                    </div>
+                  ))}
+              </div>
 
-        <div className="space-y-2">
-          {botMessages.map(({ message }, index) => (
-            <div key={index} className="p-2 px-4 bg-gray-950 rounded-lg">
-              {message}
-            </div>
-          ))}
-        </div>
-      </PageWrapper>
+              <div className="space-y-2 w-[600px] overflow-y-auto">
+                {[...visibleBotLogs]
+                  .reverse()
+                  .map((message, index) => (
+                    <BotMessage key={index} message={message} index={index} />
+                  ))}
+              </div>
+
+              <div className="w-full p-2 px-4 overflow-auto space-y-2">
+                {[...solanaTxNotifications]
+                  .reverse()
+                  .map((message, index) => (
+                    <SolanaTxNotification key={index} message={message} index={index} />
+                  ))}
+              </div>
+            </WsContentWrapper>
+          </WsPageWrapper>
+        )}
+      </div>
     </>
   );
 }

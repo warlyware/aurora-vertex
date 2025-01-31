@@ -64,6 +64,7 @@
     "react-dom": "19.0.0",
     "react-hot-toast": "^2.4.1",
     "react-json-pretty": "^2.2.0",
+    "react-json-view-lite": "^2.3.0",
     "react-use-websocket": "^4.5.0",
     "react-virtuoso": "^4.6.2",
     "ws": "^8.15.1"
