@@ -196,18 +196,19 @@ export default function Page(props: { params: Promise<any> }) {
                     </div>
                   ))}
               </div>
+              {!!visibleBotLogs.length && (
+                <div className="space-y-2 w-[600px] overflow-y-auto">
+                  {[...visibleBotLogs]
+                    .reverse()
+                    .map((message, index) => (
+                      <BotMessage key={index} message={message} index={index} />
+                    ))}
+                </div>
+              )}
 
-              <div className="space-y-2 w-[600px] overflow-y-auto">
-                {[...visibleBotLogs]
-                  .reverse()
-                  .map((message, index) => (
-                    <BotMessage key={index} message={message} index={index} />
-                  ))}
-              </div>
-
-              <div className="w-full p-2 px-4 overflow-auto space-y-2">
+              <div className="w-full p-2 px-4 overflow-auto space-y-4">
                 {[...solanaTxNotifications]
-                  .reverse()
+                  .sort((a, b) => (b?.payload?.timestamp || 0) - (a?.payload?.timestamp || 0))
                   .map((message, index) => (
                     <SolanaTxNotification key={index} message={message} index={index} />
                   ))}

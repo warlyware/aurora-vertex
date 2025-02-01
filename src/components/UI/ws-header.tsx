@@ -37,7 +37,7 @@ export const WsHeader = () => {
 
     setInterval(() => {
       pingServer();
-    }, 1000);
+    }, 30000);
 
     setHasSetupKeepAlive(true);
   }, [pingServer]);

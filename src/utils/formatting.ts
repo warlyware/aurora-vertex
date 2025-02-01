@@ -1,3 +1,5 @@
+import numeral from "numeral";
+
 export const addCommasToNumber = (value: number | string) => {
   if (typeof value === "string" && !isNaN(parseFloat(value))) {
     value = parseFloat(value);
@@ -13,3 +15,7 @@ export const truncateDescription = (
   if (description.length <= length) return description;
   return `${description.slice(0, length)}...`;
 };
+
+export const logFormatter = (number: number) => {
+  return numeral(number).format('0.00e+0');
+}

@@ -1,5 +1,7 @@
 export const getSolscanTokenUrl = (address: string) =>
   `https://solscan.io/token/${address}`;
+export const getSolscanAccountUrl = (address: string) =>
+  `https://solscan.io/account/${address}`;
 export const getSolscanTxUrl = (address: string) =>
   `https://solscan.io/tx/${address}`;
 export const getBirdEyeTokenUrl = (address: string) =>

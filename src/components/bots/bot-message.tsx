@@ -19,7 +19,7 @@ export const BotMessage = (props: {
 
 
   return (
-    <div className="p-2 px-4 bg-gray-950 rounded-lg flex flex-col gap-y-2">
+    <div className="p-2 px-4 bg-sky-950 rounded-lg flex flex-col gap-y-2 bg-opacity-50">
       <div className="font-bold">
         {message?.info ? <JSONPretty data={message.info} /> : <JSONPretty data={message} />}
       </div>

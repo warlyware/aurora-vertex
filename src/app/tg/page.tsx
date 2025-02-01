@@ -162,12 +162,7 @@ export default function WebSocketComponent() {
 
   return (
     <>
-      <WsHeader
-        latencyInMs={latencyInMs}
-        tgMessagesCount={Object.values(tgMessagesForDisplay).reduce((acc, val) => acc + val.length, 0)}
-        sendMessage={sendMessage}
-        handlePlaySound={handlePlaySound}
-      />
+      <WsHeader />
 
       <div className="w-full mx-auto flex">
         <TelegramChannelList
