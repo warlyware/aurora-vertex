@@ -1,6 +1,8 @@
 import numeral from "numeral";
 
-export const addCommasToNumber = (value: number | string) => {
+export const addCommasToNumber = (value: number | string | undefined | null) => {
+  if (!value) return "NaN";
+
   if (typeof value === "string" && !isNaN(parseFloat(value))) {
     value = parseFloat(value);
   }

@@ -25,8 +25,6 @@ export const getAbbreviatedAddress = (
     address = address.toString();
   }
 
-  if (!isPublicKey(address)) return "";
-
   if (!address) return "";
   return `${address.slice(0, identifierLength)}...${address.slice(
     address.length - identifierLength

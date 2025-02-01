@@ -91,7 +91,7 @@ export const SolanaTxNotificationDetailsExtended = (props: {
           showRawInnerInstructions &&
           result?.transaction?.meta?.innerInstructions?.map((innerInstruction, index) => (
             <div key={index} className="flex flex-col gap-y-2">
-              <div className="text-xs text-gray-400">Inner Instruction {index}</div>
+              <div className="text-gray-400 font-bold">Inner Instruction {index}</div>
               {!!innerInstruction?.instructions && innerInstruction?.instructions?.map((instruction, index) => (
                 <JSONPretty key={index} data={instruction} />
               ))}

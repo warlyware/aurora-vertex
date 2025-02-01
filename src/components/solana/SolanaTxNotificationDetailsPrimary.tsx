@@ -1,5 +1,5 @@
 import { SolanaTxNotificationType } from "@/types/helius";
-import { SolanaTxNotificationSummary } from "./SolanaTxNotificationSummary";
+import { SolanaTxNotificationSummary } from "./summary/SolanaTxNotificationSummary";
 
 export const SolanaTxNotificationDetailsPrimary = (props: {
   notification: SolanaTxNotificationType

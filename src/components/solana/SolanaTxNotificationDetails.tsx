@@ -18,14 +18,6 @@ export const SolanaTxNotificationDetails = (props: {
   return (
     <div className="flex flex-col gap-y-2">
       <SolanaTxNotificationDetailsPrimary notification={message} />
-
-
-      {showExtended &&
-        <>
-          <hr className="border-gray-400 my-4" />
-          <SolanaTxNotificationDetailsExtended message={message} />
-        </>
-      }
     </div>
   )
 }

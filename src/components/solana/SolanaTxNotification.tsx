@@ -4,6 +4,8 @@ import { GlobeAltIcon, InformationCircleIcon, ListBulletIcon } from "@heroicons/
 import { useState } from "react";
 import { SolanaTxNotificationDetails } from "./SolanaTxNotificationDetails";
 import dynamic from "next/dynamic";
+import { SolanaTxNotificationDetailsExtended } from "./SolanaTxNotificationDetailsExtended";
+import { getAbbreviatedAddress } from "@/utils";
 
 const ReactJsonView = dynamic(() => import('@microlink/react-json-view'), { ssr: false });
 
@@ -23,6 +25,7 @@ export const SolanaTxNotification = (props: {
 
   return (
     <div key={index} className=" bg-sky-900 rounded-lg flex flex-col gap-y-4 bg-opacity-30 p-4">
+      <SolanaTxNotificationDetails message={message} showExtended={showExtended} />
       <div className="flex space-x-2 items-center">
         <button
           onClick={() => setShowFullJson((prev) => !prev)}
@@ -38,10 +41,17 @@ export const SolanaTxNotification = (props: {
           <GlobeAltIcon className="h-4 w-4" />
         </a>
       </div>
-      <SolanaTxNotificationDetails message={message} showExtended={showExtended} />
+      {showExtended &&
+        <>
+          <hr className="border-gray-400 my-4" />
+          <SolanaTxNotificationDetailsExtended message={message} />
+        </>
+      }
       {showFullJson && <ReactJsonView src={result} theme="monokai" />}
       <div className="flex justify-between items-center">
-        <div className="text-xs text-gray-400">{result.signature}</div>
+        <div className="text-xs text-gray-400 text-ellipsis overflow-clip">{
+          getAbbreviatedAddress(result.signature, 10)
+        }</div>
         <div className="text-xs text-gray-400">
           {!!message?.payload?.timestamp && message.payload && new Date(message.payload.timestamp).toLocaleString()}
         </div>
