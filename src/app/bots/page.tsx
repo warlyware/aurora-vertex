@@ -27,6 +27,8 @@ export default function Page(props: { params: Promise<any> }) {
   const [botStatus, setBotStatus] = useState<any>({});
   const [isLoading, setIsLoading] = useState(true);
   const [solanaTxNotifications, setSolanaTxNotifications] = useState<SolanaTxNotificationType[]>([]);
+  const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
+
 
   const {
     BOT_NOTIFICATION,
@@ -34,8 +36,31 @@ export default function Page(props: { params: Promise<any> }) {
     BOT_STOP,
     BOT_STATUS,
     BOT_TRADE_NOTIFICATION,
+    PING,
     SOLANA_TX_NOTIFICATION
   } = messageTypes;
+
+  const pingServer = useCallback(() => {
+    const now = Date.now();
+    sendMessage(
+      JSON.stringify({
+        type: PING,
+        payload: {
+          timestamp: now,
+        },
+      })
+    );
+  }, [sendMessage, PING]);
+
+  const setupKeepAlive = useCallback(() => {
+    pingServer();
+
+    setInterval(() => {
+      pingServer();
+    }, 30000);
+
+    setHasSetupKeepAlive(true);
+  }, [pingServer]);
 
   const handleMessageData = useCallback(
     async ({ type, payload }: AuroraMessage | SolanaTxNotificationType) => {

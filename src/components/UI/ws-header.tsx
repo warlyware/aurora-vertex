@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 
 const {
-  PING,
   PONG,
 } = messageTypes;
 
@@ -16,20 +15,23 @@ export const WsHeader = () => {
   );
 
   const [latencyInMs, setLatencyInMs] = useState(0);
+  const [pingSentTime, setPingSentTime] = useState(0);
   const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
   const {
     PING,
   } = messageTypes;
 
   const pingServer = useCallback(() => {
+    const now = Date.now();
     sendMessage(
       JSON.stringify({
         type: PING,
         payload: {
-          timestamp: Date.now(),
+          timestamp: now,
         },
       })
     );
+    setPingSentTime(now);
   }, [sendMessage, PING]);
 
   const setupKeepAlive = useCallback(() => {
@@ -43,14 +45,15 @@ export const WsHeader = () => {
   }, [pingServer]);
 
   const handleMessageData = useCallback(
-    async ({ type, payload }: AuroraMessage) => {
+    async ({ type }: AuroraMessage) => {
+
       switch (type) {
         case PONG:
-          setLatencyInMs(Date.now() - payload.timestamp);
+          setLatencyInMs(Date.now() - pingSentTime);
           break;
       }
     },
-    []
+    [pingSentTime]
   );
 
   useEffect(() => {
@@ -75,16 +78,7 @@ export const WsHeader = () => {
           <div className="flex justify-end min-w-[32px]">{latencyInMs}ms</div>
         </div>
         <button className="flex"
-          onClick={() =>
-            sendMessage(
-              JSON.stringify({
-                type: PING,
-                payload: {
-                  timestamp: Date.now(),
-                },
-              })
-            )
-          }
+          onClick={pingServer}
         >
           <BoltIcon className={
             classNames([

@@ -10,6 +10,7 @@ import { addCommasToNumber } from "@/utils/formatting";
 import classNames from "classnames";
 import { SplTokenTransferSummary } from "./SplTokenTransferSummary";
 import { PumpfunBuySellSummary } from "./PumpfunBuySellSummary";
+import JSONPretty from "react-json-pretty";
 
 type SolanaInstructionTypes = 'Transaction' | 'Token Transfer' | 'Token Mint' | 'Token Burn' | 'Token Freeze' | 'Token Thaw' | 'Token Account' | 'Token Close Account';
 type SolanaActionTypes = 'SOL Transfer' | 'SPL Token Transfer' | 'Pumpfun Buy/Sell' | 'Pumpfun Buy' | 'Pumpfun Sell' | 'Photon Buy';
@@ -177,7 +178,7 @@ export const SolanaTxNotificationSummary = (props: {
     );
 
     setFormattedTxActions(dedupedActions);
-  }, [result]);
+  }, [result, logs]);
 
   return (
     <div>
@@ -202,6 +203,9 @@ export const SolanaTxNotificationSummary = (props: {
               {(action.name === 'Pumpfun Buy' || action.name === 'Pumpfun Sell')
                 && <PumpfunBuySellSummary action={action} key={index} />
               }
+              {action.name !== 'SOL Transfer' && action.name !== 'SPL Token Transfer' && action.name !== 'Pumpfun Buy' && action.name !== 'Pumpfun Sell' && (
+                <JSONPretty data={action} />
+              )}
             </div>
           ))}
       </div>
