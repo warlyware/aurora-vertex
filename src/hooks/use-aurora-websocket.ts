@@ -1,18 +1,15 @@
 import { AURORA_VERTEX_WS_URL } from "@/constants";
-import { useAuroraWebsocket } from "@/hooks/use-aurora-websocket";
 import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
-import { BoltIcon } from "@heroicons/react/24/outline";
-import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 
-const {
-  PONG,
-  PING
-} = messageTypes;
+const { PONG, PING } = messageTypes;
 
-export const WsHeader = () => {
-  const { sendMessage, readyState, lastMessage } = useAuroraWebsocket();
+export const useAuroraWebsocket = () => {
+  const { sendMessage, readyState, lastMessage } = useWebSocket(
+    `${AURORA_VERTEX_WS_URL}`,
+    { share: true, },
+  );
 
   const [latencyInMs, setLatencyInMs] = useState(0);
   const [pingSentTime, setPingSentTime] = useState(0);
@@ -63,28 +60,10 @@ export const WsHeader = () => {
     if (lastMessage !== null) {
       try {
         handleMessageData(JSON.parse(lastMessage.data));
-      } catch (e) { }
+      } catch (error) {
+        console.error('Error parsing message data', error);
+      }
     }
   }, [lastMessage, handleMessageData]);
-
-  return (
-    <div className="top-0 w-full flex justify-end items-center p-4 space-x-4 h-12 absolute">
-      <div className="flex items-center space-x-4 mr-4 text-gray-400 text-xs">
-        <div className="flex items-center space-x-1">
-          <div>server: </div>
-          <div className="flex justify-end min-w-[32px]">{latencyInMs}ms</div>
-        </div>
-        <button className="flex"
-          onClick={pingServer}
-        >
-          <BoltIcon className={
-            classNames([
-              "h-4 w-4 mr-1",
-              readyState === ReadyState.OPEN ? "text-green-600" : "text-red-700",
-            ])
-          } />
-        </button>
-      </div>
-    </div>
-  )
+  return { latencyInMs, readyState, sendMessage, lastMessage };
 }

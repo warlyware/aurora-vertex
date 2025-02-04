@@ -45,7 +45,7 @@ type SolanaTxNotificationFromHelius = {
               program: string;
               programId: string;
               parsed?: {
-                info: Record<string, any>;
+                info: any;
                 type: string;
               };
               accounts?: string[];
