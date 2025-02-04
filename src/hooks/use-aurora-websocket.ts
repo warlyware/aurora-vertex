@@ -1,4 +1,4 @@
-import { AURORA_VERTEX_WS_URL } from "@/constants";
+import { AURORA_VERTEX_FRONTEND_API_KEY, AURORA_VERTEX_WS_URL } from "@/constants";
 import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
 import { useCallback, useEffect, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
@@ -7,7 +7,7 @@ const { PONG, PING } = messageTypes;
 
 export const useAuroraWebsocket = () => {
   const { sendMessage, readyState, lastMessage } = useWebSocket(
-    `${AURORA_VERTEX_WS_URL}`,
+    `${AURORA_VERTEX_WS_URL}/?auth=${AURORA_VERTEX_FRONTEND_API_KEY}`,
     { share: true, },
   );
 

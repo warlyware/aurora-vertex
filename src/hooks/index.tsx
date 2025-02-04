@@ -28,8 +28,8 @@ type AuroraContextType = {
 
 const AuroraContext = React.createContext<AuroraContextType>({
   activeWallet: null,
-  setActiveWallet: () => {},
-  createWallet: () => {},
+  setActiveWallet: () => { },
+  createWallet: () => { },
   userWallets: [],
   isLoadingActiveWallet: false,
   isCreatingWallet: false,
@@ -116,47 +116,27 @@ export const AuroraProvider = ({ children }: { children: ReactNode }) => {
     return balances;
   };
 
-  const updateAllWalletBalances = useCallback(async () => {
-    if (!user || !userWallets.length) return;
+  // const updateActiveWalletBalances = useCallback(async () => {
+  //   if (!user || !userWallets.length) return;
 
-    let isUpdated = false;
-    const updatedWallets = await Promise.all(
-      userWallets.map(async (wallet) => {
-        const balances = await fetchWalletBalances(wallet);
-        if (isEqual(wallet.balances, balances)) {
-          isUpdated = true;
-          return { ...wallet, balances };
-        }
-        return wallet;
-      })
-    );
+  //   const activeWallet = userWallets.find((wallet) => wallet.isActiveWallet);
+  //   if (!activeWallet) return;
 
-    if (isUpdated) {
-      setUserWallets(updatedWallets);
-    }
-  }, [user, userWallets]);
+  //   const balances = await fetchWalletBalances(activeWallet);
+  //   if (!isEqual(activeWallet.balances, balances)) {
+  //     setUserWallets((wallets) =>
+  //       wallets.map((wallet) =>
+  //         wallet.id === activeWallet.id ? { ...wallet, balances } : wallet
+  //       )
+  //     );
+  //   }
+  // }, [user, userWallets]);
 
-  const updateActiveWalletBalances = useCallback(async () => {
-    if (!user || !userWallets.length) return;
-
-    const activeWallet = userWallets.find((wallet) => wallet.isActiveWallet);
-    if (!activeWallet) return;
-
-    const balances = await fetchWalletBalances(activeWallet);
-    if (!isEqual(activeWallet.balances, balances)) {
-      setUserWallets((wallets) =>
-        wallets.map((wallet) =>
-          wallet.id === activeWallet.id ? { ...wallet, balances } : wallet
-        )
-      );
-    }
-  }, [user, userWallets]);
-
-  useEffect(() => {
-    const activeWallet = userWallets.find((wallet) => wallet.isActiveWallet);
-    if (!activeWallet) return;
-    updateActiveWalletBalances();
-  }, [userWallets, updateActiveWalletBalances]);
+  // useEffect(() => {
+  //   const activeWallet = userWallets.find((wallet) => wallet.isActiveWallet);
+  //   if (!activeWallet) return;
+  //   updateActiveWalletBalances();
+  // }, [userWallets, updateActiveWalletBalances]);
 
   return (
     <Provider

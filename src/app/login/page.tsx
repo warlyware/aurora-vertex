@@ -39,7 +39,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard");
+      router.push("/bots");
     }
   }, [isAuthenticated, router]);
 
