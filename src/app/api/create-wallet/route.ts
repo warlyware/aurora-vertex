@@ -12,11 +12,6 @@ export async function POST(req: NextRequest) {
   const publicKey = keypair.publicKey.toString();
   const privateKey = keypair.secretKey.toString();
 
-  console.log({
-    publicKey,
-    privateKey,
-  });
-
   try {
     const {
       insert_keypairs_one,

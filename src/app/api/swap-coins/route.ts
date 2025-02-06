@@ -155,8 +155,6 @@ export async function POST(req: NextRequest) {
   const swapObj = await getSwapObj(wallet, quote);
   console.dir(swapObj, { depth: null });
 
-  console.log({ keypair });
-
   try {
     // Serialize the transaction
     const swapTransactionBuf = Buffer.from(swapObj.swapTransaction, "base64");

@@ -1,10 +1,11 @@
-import { AURORA_VERTEX_WS_URL } from "@/constants";
 import { useAuroraWebsocket } from "@/hooks/use-aurora-websocket";
+import { useSignOut } from "@nhost/nextjs";
 import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
-import { BoltIcon } from "@heroicons/react/24/outline";
+import { ArrowRightOnRectangleIcon, BoltIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import { useRouter } from "next/navigation";
 
 const {
   PONG,
@@ -12,11 +13,19 @@ const {
 } = messageTypes;
 
 export const WsHeader = () => {
+  const { signOut } = useSignOut();
   const { sendMessage, readyState, lastMessage } = useAuroraWebsocket();
 
   const [latencyInMs, setLatencyInMs] = useState(0);
   const [pingSentTime, setPingSentTime] = useState(0);
   const [hasSetupKeepAlive, setHasSetupKeepAlive] = useState(false);
+
+  const router = useRouter();
+
+  const handleSignOut = useCallback(() => {
+    signOut();
+    router.push("/");
+  }, [signOut, router]);
 
   const pingServer = useCallback(() => {
     const now = Date.now();
@@ -74,15 +83,16 @@ export const WsHeader = () => {
           <div>server: </div>
           <div className="flex justify-end min-w-[32px]">{latencyInMs}ms</div>
         </div>
-        <button className="flex"
-          onClick={pingServer}
-        >
+        <button onClick={pingServer}>
           <BoltIcon className={
             classNames([
               "h-4 w-4 mr-1",
               readyState === ReadyState.OPEN ? "text-green-600" : "text-red-700",
             ])
           } />
+        </button>
+        <button onClick={handleSignOut}>
+          <ArrowRightOnRectangleIcon className="h-4 w-4" />
         </button>
       </div>
     </div>

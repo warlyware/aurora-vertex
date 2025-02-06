@@ -1,59 +1,45 @@
 "use client";
-import { PageWrapper } from "@/components/UI/page-wrapper";
 import { Header } from "@/components/UI/header";
 import { Logo } from "@/components/UI/logo";
-import { CoinTable } from "@/components/tables/coin-table/coin-table";
 import { useUserData } from "@nhost/nextjs";
 import Link from "next/link";
-import { useState } from "react";
-import axios from "axios";
-import { BASE_URL } from "@/constants";
-import { PrimaryButton } from "@/components/UI/buttons/primary-button";
-import showToast from "@/utils/show-toast";
-import { RawCoinTable } from "@/components/tables/raw-coin-table/raw-coin-table";
-
-export type TokenFromJupiter = {
-  pubkey: string;
-  lamports: number;
-  data: string[];
-  owner: string;
-  executable: boolean;
-  rentEpoch: number;
-  space: number;
-  params: {
-    addressLookupTableAddress: string;
-    serumAsks: string;
-    serumBids: string;
-    serumCoinVaultAccount: string;
-    serumEventQueue: string;
-    serumPcVaultAccount: string;
-    serumVaultSigner: string;
-  };
-  timestamp?: string;
-};
+import WsPageWrapper from "@/components/UI/ws-page-wrapper";
+import WsContentWrapper from "@/components/UI/ws-content-wrapper";
 
 export default function Dashboard() {
   const user = useUserData();
 
   return (
     <>
-      {!!user?.id && <Header />}
-      <PageWrapper>
-        {!!user?.id ? (
-          <div className="w-full -mt-12">
-            <div className="flex gap-x-2 mx-2">
+      {!!user?.id ? (
+        <WsPageWrapper>
+          <WsContentWrapper
+            className="flex w-full"
+          >
+            <div className="flex flex-col gap-6 p-6 w-full">
+              <Link href="/feed"
+                className="border border-gray-200 rounded-lg p-6 hover:border-sky-500 transition-colors flex flex-col"
+              >
+                <h2 className="text-xl font-semibold mb-2 group-hover:text-sky-500">Activity Feed</h2>
+                <p className="text-gray-600">View real-time feed of transaction activity monitored by the system</p>
+              </Link>
+
+              <Link href="/bots"
+                className="border border-gray-200 rounded-lg p-6 hover:border-sky-500 transition-colors flex flex-col"
+              >
+                <h2 className="text-xl font-semibold mb-2 group-hover:text-sky-500">Trading Bots</h2>
+                <p className="text-gray-600">Manage and monitor your automated trading bots</p>
+              </Link>
             </div>
-            {/* <RawCoinTable coins={rawCoins} /> */}
-            {/* <CoinTable coins={coins} /> */}
+          </WsContentWrapper>
+        </WsPageWrapper>
+      ) : (
+        <Link href="/login">
+          <div className="mt-16">
+            <Logo />
           </div>
-        ) : (
-          <Link href="/login">
-            <div className="mt-16">
-              <Logo />
-            </div>
-          </Link>
-        )}
-      </PageWrapper>
+        </Link>
+      )}
     </>
   );
 }
