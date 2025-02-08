@@ -13,8 +13,27 @@ export default function TradersList() {
   const fetchTraders = useCallback(async () => {
     const response = await fetch(`${BASE_URL}/api/get-traders`);
     const data = await response.json();
-    setTraders(data.body.traders);
+    setTraders(data.body.traders?.sort((a: Trader, b: Trader) => a.id.localeCompare(b.id)));
   }, []);
+
+  const updateTrader = async (id: string, name: string) => {
+    console.log(typeof id, name)
+    const response = await fetch(`${BASE_URL}/api/update-trader`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: id,
+        trader: {
+          name: name,
+        },
+      }),
+    });
+    const data = await response.json();
+    await fetchTraders()
+    setEditId('')
+  }
 
   const setTraderToEdit = (trader: Trader) => {
     setEditId(trader.id)
@@ -39,7 +58,10 @@ export default function TradersList() {
           >
             &#10005;
           </button>
-          <div className="w-7 text-center rounded-lg text-green-500 hover:bg-slate-50 cursor-pointer">
+          <div 
+            className="w-7 text-center rounded-lg text-green-500 hover:bg-slate-50 cursor-pointer"
+            onClick={(() => updateTrader(trader.id, traderName))}
+          >
             &#10003;
           </div>
           <input
