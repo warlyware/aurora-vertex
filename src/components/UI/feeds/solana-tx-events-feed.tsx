@@ -1,16 +1,12 @@
-"use client";
 import { SolanaTxNotification } from "@/components/solana/SolanaTxNotification";
-import { SolanaTxEventsFeed } from "@/components/UI/feeds/solana-tx-events-feed";
-import Spinner from "@/components/UI/spinner";
-import WsContentWrapper from "@/components/UI/ws-content-wrapper";
-import WsPageWrapper from "@/components/UI/ws-page-wrapper";
-import { useAuroraWebsocket } from "@/hooks/use-aurora-websocket";
 import { SolanaTxNotificationType } from "@/types/helius";
-import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
-import { useCallback, useEffect, useState, use, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { useAuroraWebsocket } from "@/hooks/use-aurora-websocket";
+import { messageTypes } from "@/types/websockets/messages";
+import { AuroraMessage } from "@/types/websockets/messages";
 import { ReadyState } from "react-use-websocket";
 
-export default function Page(props: { params: Promise<any> }) {
+export const SolanaTxEventsFeed = () => {
   const { sendMessage, lastMessage, readyState } = useAuroraWebsocket();
 
   const bots = useMemo(() => ['SAMWISE', 'BILBO', 'FRODO'], []);
@@ -60,20 +56,12 @@ export default function Page(props: { params: Promise<any> }) {
   }, [lastMessage, handleMessageData]);
 
   return (
-    <>
-      <div className="flex w-full">
-        {isLoading ? <div className="pt-32 w-full flex justify-center">
-          <Spinner />
-        </div> : (
-          <WsPageWrapper>
-            <WsContentWrapper
-              className="flex w-full"
-            >
-              <SolanaTxEventsFeed />
-            </WsContentWrapper>
-          </WsPageWrapper>
-        )}
-      </div>
-    </>
+    <div className="w-full p-2 px-4 overflow-auto space-y-4">
+      {[...solanaTxNotifications]
+        .sort((a, b) => (b?.payload?.timestamp || 0) - (a?.payload?.timestamp || 0))
+        .map((message, index) => (
+          <SolanaTxNotification key={index} message={message} index={index} />
+        ))}
+    </div>
   );
-}
+};

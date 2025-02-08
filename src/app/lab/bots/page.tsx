@@ -19,10 +19,9 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
 
   const {
     PING,
-    BOT_NOTIFICATION,
     BOT_SPAWN,
     BOT_STOP,
-    BOT_STATUS
+    BOT_STATUS_UPDATE
   } = messageTypes;
 
   const setupKeepAlive = useCallback(() => {
@@ -44,11 +43,7 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
     async ({ type, payload }: AuroraMessage) => {
       console.log("Received message", type, payload);
       switch (type) {
-        case BOT_NOTIFICATION:
-          console.log("Received bot message", payload);
-          setBotMessages((prev) => [...prev, payload]);
-          break;
-        case BOT_STATUS:
+        case BOT_STATUS_UPDATE:
           console.log("Received bot status", payload);
           setBotStatus(
             (prev: any) => ({

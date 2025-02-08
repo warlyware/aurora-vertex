@@ -1,6 +1,6 @@
 import { messageTypes } from "../websockets/messages";
 
-const { SOLANA_TX_NOTIFICATION } = messageTypes;
+const { SOLANA_TX_NOTIFICATION_FROM_HELIUS } = messageTypes;
 
 type SolanaTxNotificationFromHelius = {
   timestamp?: number;
@@ -90,6 +90,6 @@ type SolanaTxNotificationFromHelius = {
 };
 
 export type SolanaTxNotificationType = {
-  type: typeof SOLANA_TX_NOTIFICATION;
+  type: typeof SOLANA_TX_NOTIFICATION_FROM_HELIUS;
   payload: SolanaTxNotificationFromHelius;
 };

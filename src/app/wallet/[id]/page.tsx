@@ -59,17 +59,22 @@ export default function WalletDetails(props: { params: Promise<any> }) {
         <div className="text-xl mb-4">{wallet?.balances?.lamports} lamports</div>
         {!!wallet?.balances?.splTokens?.length && (
           <div className="max-w-md mx-auto w-full text-lg">
-            {wallet?.balances?.splTokens?.map((token: TokenBalance) => (
-              <div
-                className="flex justify-between space-x-8"
-                key={token.symbol}
-              >
-                <div className="w-1/2 flex justify-end">${token.symbol}</div>
-                <div className="w-1/2 flex items-center">
-                  <div className="mr-8">{addCommasToNumber(token.amount / 10 ** token.decimals)}</div>
+            {wallet?.balances?.splTokens
+              ?.filter((token: TokenBalance) => token.amount > 0)
+              .map((token: TokenBalance) => (
+                <div
+                  className="flex justify-between space-x-8"
+                  key={token.symbol}
+                >
+                  <div className="w-1/2 flex justify-end space-x-2">
+                    <div>${token.symbol}</div>
+                    <CopyToClipboardButton text={token.mint} />
+                  </div>
+                  <div className="w-1/2 flex items-center">
+                    <div className="mr-8">{addCommasToNumber(token.amount / 10 ** token.decimals)}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </WsContentWrapper>

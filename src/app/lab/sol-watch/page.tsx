@@ -17,7 +17,7 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
   const [solanaTxNotifications, setSolanaTxNotifications] = useState<AuroraMessage[]>([]);
 
   const {
-    SOLANA_TX_NOTIFICATION,
+    SOLANA_TX_NOTIFICATION_FROM_HELIUS,
     PING,
     PONG,
   } = messageTypes;
@@ -45,7 +45,7 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
           setLatencyInMs(latency);
           break;
 
-        case SOLANA_TX_NOTIFICATION:
+        case SOLANA_TX_NOTIFICATION_FROM_HELIUS:
           setSolanaTxNotifications((prev) => [...prev, { type, payload }]);
           break;
         default:
