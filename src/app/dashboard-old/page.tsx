@@ -10,7 +10,6 @@ import axios from "axios";
 import { BASE_URL } from "@/constants";
 import { PrimaryButton } from "@/components/UI/buttons/primary-button";
 import showToast from "@/utils/show-toast";
-import { RawCoinTable } from "@/components/tables/raw-coin-table/raw-coin-table";
 
 export type TokenFromJupiter = {
   pubkey: string;
@@ -128,7 +127,6 @@ export default function Dashboard() {
                 Fetch Latest from Redis
               </PrimaryButton>
             </div>
-            <RawCoinTable coins={rawCoins} />
             {/* <CoinTable coins={coins} /> */}
           </div>
         ) : (
