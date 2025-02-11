@@ -1,3 +1,4 @@
+'use client'
 import { useUserData } from "@nhost/nextjs";
 import { WsHeader } from "./ws-header";
 import { Unauthorized } from "./unauthorized";

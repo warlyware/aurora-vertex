@@ -1,3 +1,4 @@
+'use client'
 import { SolanaTxNotification } from "@/components/solana/SolanaTxNotification";
 import { SolanaTxNotificationType } from "@/types/helius";
 import { useEffect, useState, useMemo, useCallback } from "react";
@@ -6,6 +7,7 @@ import { messageTypes } from "@/types/websockets/messages";
 import { AuroraMessage } from "@/types/websockets/messages";
 import { ReadyState } from "react-use-websocket";
 import { ServerLogMessage } from "../logs/server-log-message";
+
 
 export const ServerLogsFeed = () => {
   const { sendMessage, lastMessage, readyState } = useAuroraWebsocket();

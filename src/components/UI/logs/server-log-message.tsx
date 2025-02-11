@@ -1,3 +1,4 @@
+'use client'
 import { AuroraMessage } from "@/types/websockets/messages";
 
 export const ServerLogMessage = ({ message, index }: { message: AuroraMessage, index: number }) => {

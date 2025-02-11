@@ -1,3 +1,4 @@
+'use client'
 // https://codepen.io/MaxStalker/details/DJzybq
 
 import Image from "next/image";

@@ -1,3 +1,4 @@
+'use client'
 import { useAuroraWebsocket } from "@/hooks/use-aurora-websocket";
 import { messageTypes } from "@/types/websockets/messages";
 import { AuroraMessage } from "@/types/websockets/messages";

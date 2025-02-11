@@ -1,3 +1,4 @@
+'use client'
 import classNames from "classnames";
 
 export default function WsContentWrapper(props: { children: React.ReactNode, className?: string }) {

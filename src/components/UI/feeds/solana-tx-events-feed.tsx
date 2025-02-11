@@ -1,3 +1,4 @@
+'use client'
 import { SolanaTxNotification } from "@/components/solana/SolanaTxNotification";
 import { SolanaTxNotificationType } from "@/types/helius";
 import { useEffect, useState, useMemo, useCallback } from "react";
