@@ -13,13 +13,12 @@ import {
   LinkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { TokenFromJupiter } from "@/app/dashboard/page";
 
-export const RawCoinTable = ({ coins }: { coins: TokenFromJupiter[] }) => {
+export const RawCoinTable = ({ coins }: { coins: any[] }) => {
   const rerender = React.useReducer(() => ({}), {})[1];
 
   const [sorting, setSorting] = React.useState([]);
-  const [formattedCoins, setFormattedCoins] = useState<TokenFromJupiter[]>([]);
+  const [formattedCoins, setFormattedCoins] = useState<any[]>([]);
 
   useEffect(() => {
     if (coins.length > 0) {
@@ -33,7 +32,7 @@ export const RawCoinTable = ({ coins }: { coins: TokenFromJupiter[] }) => {
     }
   }, [coins]);
 
-  const columns = useMemo<ColumnDef<TokenFromJupiter>[]>(
+  const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
         header: () => <div className="uppercase py-2 mr-4 px-4">PubKey</div>,
