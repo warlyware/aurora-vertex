@@ -15,10 +15,15 @@ interface BotCardListProps {
         }
       }
     }
+    buyRatio: number;
+    priorityFeeInLamports: number;
+    ejectWallet: {
+      address: string;
+    }
   }>;
   onBotStatusUpdate?: (status: Record<string, any>) => void;
   visibleLogBotIds: string[];
-  onToggleVisibility: (value: (prev: string[]) => string[]) => void;
+  onToggleVisibility: (value: string[]) => void;
 }
 
 export const BotCardList: React.FC<BotCardListProps> = ({
@@ -68,7 +73,7 @@ export const BotCardList: React.FC<BotCardListProps> = ({
           type: BOT_SPAWN,
           payload: {
             botId,
-            strategy: 'default',
+            strategy: 'DEFAULT',
           },
         })
       ),
@@ -104,11 +109,10 @@ export const BotCardList: React.FC<BotCardListProps> = ({
           botLogs={botLogs.filter((log) => log.botId === bot.id)}
           visibleBotLogs={botLogs}
           onToggleVisibility={(botId: string) => {
-            onToggleVisibility(prev =>
-              prev.includes(botId)
-                ? prev.filter(id => id !== botId)
-                : [...prev, botId]
-            );
+            const newVisibleIds = visibleLogBotIds.includes(botId)
+              ? visibleLogBotIds.filter(id => id !== botId)
+              : [...visibleLogBotIds, botId];
+            onToggleVisibility(newVisibleIds);
           }}
           onBotAction={(botId: string) => {
             if (botStatus[botId]?.isActive) {

@@ -17,11 +17,14 @@ export const ServerLogsFeed = () => {
   const [serverLogs, setServerLogs] = useState<AuroraMessage[]>([]);
 
   const {
-    SERVER_LOG_EVENT
+    SERVER_LOG_EVENT,
+    BOT_STATUS_UPDATE,
   } = messageTypes;
 
   const handleMessageData = useCallback(
-    async ({ type, payload }: AuroraMessage | SolanaTxNotificationType) => {
+    async ({ type, payload }: AuroraMessage) => {
+
+      if (type === BOT_STATUS_UPDATE) return;
 
       switch (type) {
         case SERVER_LOG_EVENT:
@@ -54,7 +57,8 @@ export const ServerLogsFeed = () => {
   return (
     <div className="w-full p-2 px-4 overflow-auto space-y-4">
       {[...serverLogs]
-        .sort((a, b) => (b?.payload?.timestamp || 0) - (a?.payload?.timestamp || 0))
+        .reverse()
+        // .sort((a, b) => (b?.payload?.timestamp || 0) - (a?.payload?.timestamp || 0))
         .map((message, index) => (
           <ServerLogMessage key={index} message={message} index={index} />
         ))}

@@ -16,16 +16,20 @@ export const SolanaTxEventsFeed = () => {
   const [solanaTxNotifications, setSolanaTxNotifications] = useState<SolanaTxNotificationType[]>([]);
 
   const {
-    SOLANA_TX_EVENT
+    SOLANA_TX_EVENT,
+    BOT_STATUS_UPDATE,
   } = messageTypes;
 
   const handleMessageData = useCallback(
     async ({ type, payload }: AuroraMessage | SolanaTxNotificationType) => {
 
+      if (type === BOT_STATUS_UPDATE) return;
+
       console.log('handleMessageData', type);
       if (type === SOLANA_TX_EVENT) {
         console.log('SOLANA_TX_EVENT received', payload?.params?.result?.signature);
       }
+
 
       switch (type) {
         case SOLANA_TX_EVENT:

@@ -1,5 +1,4 @@
 "use client";
-import { Header } from "@/components/UI/header";
 import { Logo } from "@/components/UI/logo";
 import { useUserData } from "@nhost/nextjs";
 import Link from "next/link";
@@ -37,7 +36,7 @@ export default function Dashboard() {
           <WsContentWrapper
             className="flex flex-col w-full"
           >
-            <div className="flex w-full h-64 bg-gray-100 rounded-lg bg-opacity-30">
+            <div className="flex w-full h-96 bg-gray-100 rounded-lg bg-opacity-30">
               <BotCardList
                 bots={bots}
                 visibleLogBotIds={visibleLogBotIds}
@@ -45,15 +44,15 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex w-full h-full">
-              <div className="flex flex-col w-1/3 bg-slate-500 bg-opacity-30 overflow-y-auto">
+              <div className="flex flex-col w-1/3 bg-slate-500 bg-opacity-30 overflow-y-auto p-4">
                 <div className="text-lg">Server Logs</div>
                 <ServerLogsFeed />
               </div>
-              <div className="flex flex-col w-1/3 bg-yellow-500 bg-opacity-30">
+              <div className="flex flex-col w-1/3 bg-yellow-500 bg-opacity-30 p-4">
                 <div className="text-lg">Solana Tx Events</div>
                 <SolanaTxEventsFeed />
               </div>
-              <div className="flex flex-col w-1/3 bg-green-500 bg-opacity-30 overflow-y-auto">
+              <div className="flex flex-col w-1/3 bg-green-500 bg-opacity-30 overflow-y-auto p-4">
                 <div className="text-lg">Bot Activity</div>
                 <BotEventsFeed visibleLogBotIds={visibleLogBotIds} />
               </div>

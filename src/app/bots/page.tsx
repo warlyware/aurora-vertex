@@ -24,6 +24,12 @@ type AuroraBot = {
   user: {
     id: string;
   }
+  strategy: string;
+  buyRatio: number;
+  priorityFeeInLamports: number;
+  ejectWallet: {
+    address: string;
+  }
 }
 
 export default function Page() {

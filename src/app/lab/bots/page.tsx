@@ -66,7 +66,7 @@ export default function CoinDetailPage(props: { params: Promise<any> }) {
           type: BOT_SPAWN,
           payload: {
             botId,
-            strategy: 'default',
+            strategy: 'DEFAULT',
           },
         })
       ),

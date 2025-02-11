@@ -25,11 +25,15 @@ export const BotEventsFeed: React.FC<BotEventsFeedProps> = ({
   const {
     BOT_TRADE_NOTIFICATION,
     BOT_LOG_EVENT,
+    BOT_STATUS_UPDATE,
   } = messageTypes;
 
 
   const handleMessageData = useCallback(
     async ({ type, payload }: AuroraMessage | SolanaTxNotificationType) => {
+
+      if (type === BOT_STATUS_UPDATE) return;
+      console.log('handleMessageData', type);
 
       switch (type) {
         case BOT_TRADE_NOTIFICATION:
@@ -69,8 +73,8 @@ export const BotEventsFeed: React.FC<BotEventsFeedProps> = ({
   }, [visibleLogBotIds, botLogs]);
 
   return (
-    <div className="space-y-2 w-[600px] overflow-y-auto overflow-x-hidden">
-      {[...visibleBotLogs]
+    <div className="space-y-2 w-[600px] overflow-y-auto overflow-x-hidden -mx-2">
+      {[...botLogs]
         .reverse()
         .map((message, index) => (
           <BotMessage key={index} message={message} index={index} />
