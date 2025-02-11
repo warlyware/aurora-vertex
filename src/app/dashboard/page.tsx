@@ -61,7 +61,7 @@ export default function Dashboard() {
                 onToggleVisibility={setVisibleLogBotIds}
               />
             </div>
-            <div className="flex w-full h-full">
+            <div className="flex w-full" style={{ height: 'calc(100% - 384px)' }}>
               <div className="flex flex-col w-1/3 bg-slate-500 bg-opacity-30 overflow-y-auto p-4">
                 <div className="text-lg">Server Logs</div>
                 <ServerLogsFeed />
