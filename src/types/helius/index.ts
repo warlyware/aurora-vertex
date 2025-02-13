@@ -2,6 +2,17 @@ import { messageTypes } from "../websockets/messages";
 
 const { SOLANA_TX_NOTIFICATION_FROM_HELIUS } = messageTypes;
 
+export type TxAction = {
+  type: 'PUMPFUN_BUY' | 'PUMPFUN_SELL' | 'RAYDIUM_SWAP' | 'TOKEN_TRANSFER' | 'SOL_TRANSFER';
+  source: string;
+  destination?: string;
+  solAmount?: number;    // For SOL transfers and swaps
+  tokenAmount?: number;  // For token transfers and swaps
+  tokenMint?: string;
+  description: string;
+  rawInfo?: any;
+}
+
 type SolanaTxNotificationFromHelius = {
   timestamp?: number;
   jsonrpc: "2.0";
@@ -91,5 +102,8 @@ type SolanaTxNotificationFromHelius = {
 
 export type SolanaTxNotificationType = {
   type: typeof SOLANA_TX_NOTIFICATION_FROM_HELIUS;
-  payload: SolanaTxNotificationFromHelius;
+  payload: {
+    tx: SolanaTxNotificationFromHelius;
+    actions: TxAction[];
+  };
 };

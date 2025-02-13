@@ -9,7 +9,7 @@ export const SolanaTxNotificationDetails = (props: {
 }) => {
 
   const { message, showExtended } = props;
-  const result = message?.payload?.params?.result;
+  const result = message?.payload?.tx?.params?.result;
 
   if (!result) {
     return null;

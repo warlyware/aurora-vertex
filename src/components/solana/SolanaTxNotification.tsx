@@ -6,6 +6,7 @@ import { SolanaTxNotificationDetails } from "./SolanaTxNotificationDetails";
 import dynamic from "next/dynamic";
 import { SolanaTxNotificationDetailsExtended } from "./SolanaTxNotificationDetailsExtended";
 import { getAbbreviatedAddress } from "@/utils";
+import { CopyToClipboardButton } from "../UI/buttons/copy-to-clipboard-button";
 
 const ReactJsonView = dynamic(() => import('@microlink/react-json-view'), { ssr: false });
 
@@ -17,7 +18,7 @@ export const SolanaTxNotification = (props: {
   const [showExtended, setShowExtended] = useState(false);
 
   const { message, index } = props;
-  const result = message?.payload?.params?.result;
+  const result = message?.payload?.tx?.params?.result;
 
   if (!result?.signature) {
     return null;
@@ -37,6 +38,7 @@ export const SolanaTxNotification = (props: {
         >
           <InformationCircleIcon className="h-4 w-4" />
         </button>
+        <CopyToClipboardButton text={JSON.stringify(result)} />
         <a href={getSolscanTxUrl(result.signature)} target="_blank" rel="noreferrer">
           <GlobeAltIcon className="h-4 w-4" />
         </a>
@@ -53,7 +55,7 @@ export const SolanaTxNotification = (props: {
           getAbbreviatedAddress(result.signature, 10)
         }</div>
         <div className="text-xs text-gray-400">
-          {!!message?.payload?.timestamp && message.payload && new Date(message.payload.timestamp).toLocaleString()}
+          {!!message?.payload?.tx?.timestamp && message.payload && new Date(message.payload.tx.timestamp).toLocaleString()}
         </div>
       </div>
     </div>

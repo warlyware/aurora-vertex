@@ -5,7 +5,7 @@ export const SolanaTxNotificationDetailsPrimary = (props: {
   notification: SolanaTxNotificationType
 }) => {
   const { notification } = props;
-  const result = notification?.payload?.params?.result;
+  const result = notification?.payload?.tx?.params?.result;
 
   if (!result) {
     return null;

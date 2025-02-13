@@ -63,7 +63,7 @@ export const SolanaTxEventsFeed = () => {
   return (
     <div className="w-full p-2 px-4 overflow-auto space-y-4">
       {[...solanaTxNotifications]
-        .sort((a, b) => (b?.payload?.timestamp || 0) - (a?.payload?.timestamp || 0))
+        .sort((a, b) => (b?.payload?.tx?.timestamp || 0) - (a?.payload?.tx?.timestamp || 0))
         .map((message, index) => (
           <SolanaTxNotification key={index} message={message} index={index} />
         ))}

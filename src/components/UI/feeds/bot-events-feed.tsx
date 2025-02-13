@@ -74,7 +74,7 @@ export const BotEventsFeed: React.FC<BotEventsFeedProps> = ({
   }, [visibleLogBotIds, botLogs]);
 
   return (
-    <div className="space-y-2 w-[600px] overflow-y-auto overflow-x-hidden -mx-2">
+    <div className="space-y-2 overflow-y-auto overflow-x-hidden -mx-2">
       {[...botLogs]
         .reverse()
         .map((message, index) => (
