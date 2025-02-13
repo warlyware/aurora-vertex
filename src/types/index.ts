@@ -42,3 +42,12 @@ export type EnhancedWallet = Wallet & {
     sol: number;
   };
 };
+
+export interface Trader {
+  id: string;
+  name: string;
+  createdAt: string;
+  wallet: {
+    id: string;
+  }
+};
