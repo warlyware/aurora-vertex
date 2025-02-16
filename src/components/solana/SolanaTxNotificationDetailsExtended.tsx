@@ -15,7 +15,7 @@ export const SolanaTxNotificationDetailsExtended = (props: {
   const [showRawErr, setShowRawErr] = useState(false);
 
   const { message } = props;
-  const result = message?.payload?.params?.result;
+  const result = message?.payload?.tx?.params?.result;
 
   return (
     <div className="flex">

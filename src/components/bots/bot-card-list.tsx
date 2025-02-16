@@ -16,8 +16,6 @@ interface BotCardListProps {
         }
       }
     }
-    buyRatio: number;
-    priorityFeeInLamports: number;
     ejectWallet: {
       address: string;
     }

@@ -105,5 +105,6 @@ export type SolanaTxNotificationType = {
   payload: {
     tx: SolanaTxNotificationFromHelius;
     actions: TxAction[];
+    info?: string;
   };
 };

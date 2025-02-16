@@ -1,5 +1,5 @@
 'use client'
-import { CheckCircleIcon, EyeIcon, EyeSlashIcon, PowerIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, EyeIcon, EyeSlashIcon, PowerIcon, PencilIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import classNames from "classnames";
 import { BotStatus } from "./bot-status";
@@ -8,11 +8,11 @@ import { FormInputWithLabel } from "../UI/forms/form-input-with-label";
 import { useFormik } from "formik";
 import { AURORA_VERTEX_API_URL } from "@/constants";
 import axios from "axios";
-import { PrimaryButton } from "../UI/buttons/primary-button";
 import { useState } from "react";
 import Spinner from "../UI/spinner";
 import showToast from "@/utils/show-toast";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+
 type BotCardProps = {
   bot: {
     id: string;
@@ -24,8 +24,6 @@ type BotCardProps = {
         }
       }
     }
-    buyRatio: number;
-    priorityFeeInLamports: number;
     ejectWallet?: {
       address: string;
     }
@@ -46,13 +44,9 @@ export function BotCard({
 
   const formik = useFormik({
     initialValues: {
-      buyRatio: bot?.buyRatio,
-      priorityFee: bot?.priorityFeeInLamports / LAMPORTS_PER_SOL,
       ejectWalletAddress: bot?.ejectWallet?.address,
     },
-    onSubmit: async ({ priorityFee, buyRatio }) => {
-      console.log(priorityFee, buyRatio);
-
+    onSubmit: async ({ ejectWalletAddress }) => {
       console.log('onSubmit');
 
       let data;
@@ -62,8 +56,6 @@ export function BotCard({
           `${AURORA_VERTEX_API_URL}/update-bot-settings`,
           {
             botId: bot.id,
-            priorityFee,
-            buyRatio,
             ejectWalletAddress: formik.values.ejectWalletAddress,
             apiKey: process.env.NEXT_PUBLIC_AURORA_VERTEX_FRONTEND_API_KEY,
           });
@@ -91,7 +83,7 @@ export function BotCard({
     <div className="w-full p-2 px-4 bg-sky-950 rounded-lg">
       <div className="flex flex-col">
         <div className="flex justify-between space-x-2 mb-2 items-center">
-          <div className="flex">
+          <div className="flex items-center">
             <div className="flex items-center">
               {botStatus?.isActive ? (
                 <div className="bg-green-600 h-3 w-3 rounded-full shadow-inner" />
@@ -116,6 +108,9 @@ export function BotCard({
                 <EyeSlashIcon className="h-4 w-4" />
               )}
             </button> */}
+            <Link href={`/bot/${bot.id}`} target="_blank">
+              <Cog6ToothIcon className="h-4 w-4" />
+            </Link>
             <button onClick={() => onBotAction(bot.id)}>
               <PowerIcon className="h-4 w-4" />
             </button>
@@ -131,22 +126,6 @@ export function BotCard({
       <BotStatus status={botStatus} className="mb-4" />
       <hr className="mb-4" />
       <form onSubmit={formik.handleSubmit}>
-        <div className="flex py-2 space-x-2">
-          <FormInputWithLabel
-            label="Priority Fee"
-            name="priorityFee"
-            type="number"
-            value={formik.values.priorityFee}
-            onChange={formik.handleChange}
-          />
-          <FormInputWithLabel
-            label="Buy Ratio"
-            name="buyRatio"
-            type="number"
-            value={formik.values.buyRatio}
-            onChange={formik.handleChange}
-          />
-        </div>
         <div className="flex py-2 space-x-2 items-end justify-between">
           <FormInputWithLabel
             label="Eject Wallet"

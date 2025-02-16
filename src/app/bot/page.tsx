@@ -35,8 +35,6 @@ type AuroraBot = {
     id: string;
   }
   strategy: string;
-  buyRatio: number;
-  priorityFeeInLamports: number;
   ejectWallet: {
     address: string;
   }

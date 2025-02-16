@@ -8,20 +8,22 @@ export const SolanaTxNotificationSummary = (props: {
   const { notification } = props;
   const actions = notification?.payload?.actions || [];
 
+  if (actions.every(action => action.type === 'SOL_TRANSFER' || action.type === 'TOKEN_TRANSFER')) {
+    return <></>
+  }
+
   return (
     <div className="flex flex-col space-y-2 rounded-lg p-4">
-      {actions.map((action, index) => (
-        <div key={index} className={classNames([
-          "rounded p-2",
-          {
-            "bg-sky-700 bg-opacity-30": action.type === 'SOL_TRANSFER',
-            "bg-orange-600 bg-opacity-50": action.type === 'TOKEN_TRANSFER',
-            "bg-green-700 bg-opacity-80": action.type === 'PUMPFUN_BUY',
-            "bg-pink-600 bg-opacity-50": action.type === 'PUMPFUN_SELL',
-            "bg-sky-800": action.type === 'RAYDIUM_SWAP'
-          }
-        ])}>
-          <div className="text-gray-200">{action.description}</div>
+      {actions.map((action, i) => (
+        <div key={i} className="flex gap-x-4">
+          <div className={classNames(["font-bold text-sm mb-4", {
+            "text-green-400": action.type === "PUMPFUN_BUY",
+            "text-red-400": action.type === "PUMPFUN_SELL",
+            "text-blue-400": action.type === "RAYDIUM_SWAP",
+            "text-yellow-400": action.type === "TOKEN_TRANSFER",
+            "text-purple-400": action.type === "SOL_TRANSFER"
+          }])}>{action.type}</div>
+          <div className="text-gray-400 italic text-sm">{action.description}</div>
         </div>
       ))}
     </div>
