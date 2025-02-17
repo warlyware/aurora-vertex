@@ -1,5 +1,4 @@
 "use client";
-import { SolanaTxNotification } from "@/components/solana/SolanaTxNotification";
 import { SolanaTxEventsFeed } from "@/components/UI/feeds/solana-tx-events-feed";
 import Spinner from "@/components/UI/spinner";
 import WsContentWrapper from "@/components/UI/ws-content-wrapper";

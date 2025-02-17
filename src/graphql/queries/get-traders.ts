@@ -8,6 +8,7 @@ export const GET_TRADERS = gql`
       createdAt
       wallet { 
         id
+        address
       }
     }
   }

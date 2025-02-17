@@ -17,7 +17,6 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // check if trader already exists
   const { traders }: {
     traders: {
       id: string;
@@ -85,7 +84,7 @@ export async function POST(req: NextRequest) {
     variables: {
       trader: {
         walletId,
-        name: "Trader",
+        name,
       }
     },
   });

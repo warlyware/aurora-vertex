@@ -4,13 +4,25 @@ import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
 import { ArrowRightOnRectangleIcon, BoltIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
-import useWebSocket, { ReadyState } from "react-use-websocket";
+import { ReadyState } from "react-use-websocket";
 import { useRouter } from "next/navigation";
 
 const {
   PONG,
   PING
 } = messageTypes;
+
+const links = [
+  {
+    label: "dashboard",
+    href: "/dashboard",
+  },
+  {
+    label: "traders",
+    href: "/trader",
+  },
+
+];
 
 export const WsHeader = () => {
   const { signOut } = useSignOut();
@@ -77,7 +89,12 @@ export const WsHeader = () => {
   }, [lastMessage, handleMessageData]);
 
   return (
-    <div className="top-0 w-full flex justify-end items-center p-4 space-x-4 h-12 absolute">
+    <div className="top-0 w-full flex justify-between items-center p-4 space-x-4 h-12 absolute">
+      <div className="flex items-center">
+        <div className="flex items-center space-x-1">
+
+        </div>
+      </div>
       <div className="flex items-center space-x-4 mr-4 text-gray-400 text-xs">
         <div className="flex items-center space-x-1">
           <div>server: </div>

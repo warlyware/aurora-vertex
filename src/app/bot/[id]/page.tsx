@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import WsPageWrapper from "@/components/UI/ws-page-wrapper";
 import WsContentWrapper from "@/components/UI/ws-content-wrapper";
 import { AuroraBot, BotStrategyForm } from "@/components/bots/bot-strategy-form";

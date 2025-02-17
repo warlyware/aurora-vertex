@@ -1,14 +1,17 @@
 import { AURORA_VERTEX_FRONTEND_API_KEY, AURORA_VERTEX_WS_URL } from "@/constants";
 import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
+import { useUserData } from "@nhost/nextjs";
 import { useCallback, useEffect, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 
 const { PONG, PING } = messageTypes;
 
 export const useAuroraWebsocket = () => {
+  const user = useUserData();
+
   const { sendMessage, readyState, lastMessage } = useWebSocket(
-    `${AURORA_VERTEX_WS_URL}/?auth=${AURORA_VERTEX_FRONTEND_API_KEY}`,
-    { share: true, },
+    user?.id ? `${AURORA_VERTEX_WS_URL}/?auth=${AURORA_VERTEX_FRONTEND_API_KEY}&userId=${user.id}` : null,
+    { share: true },
   );
 
   const [latencyInMs, setLatencyInMs] = useState(0);
@@ -31,11 +34,15 @@ export const useAuroraWebsocket = () => {
   const setupKeepAlive = useCallback(() => {
     pingServer();
 
-    setInterval(() => {
+    // Store interval ID so we can clear it
+    const intervalId = setInterval(() => {
       pingServer();
     }, 30000);
 
     setHasSetupKeepAlive(true);
+
+    // Return cleanup function
+    return () => clearInterval(intervalId);
   }, [pingServer]);
 
   const handleMessageData = useCallback(
@@ -52,7 +59,7 @@ export const useAuroraWebsocket = () => {
 
   useEffect(() => {
     if (readyState === ReadyState.OPEN && !hasSetupKeepAlive) {
-      setupKeepAlive();
+      return setupKeepAlive(); // Return cleanup function
     }
   }, [hasSetupKeepAlive, readyState, setupKeepAlive]);
 
