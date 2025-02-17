@@ -28,7 +28,8 @@ export const FormSelectInputWithLabel = ({
 }: Props) => {
   return (
     <label htmlFor={name} className="flex flex-col w-full">
-      {hideLabel ? null : label}
+      {hideLabel ? null : <span className="text-xs uppercase mb-1 ml-1">{label}</span>}
+
       <select
         className={classNames(
           "p-2 rounded-xl w-full text-gray-100 bg-gray-500",

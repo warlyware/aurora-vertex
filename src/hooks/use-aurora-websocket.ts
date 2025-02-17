@@ -34,14 +34,12 @@ export const useAuroraWebsocket = () => {
   const setupKeepAlive = useCallback(() => {
     pingServer();
 
-    // Store interval ID so we can clear it
     const intervalId = setInterval(() => {
       pingServer();
     }, 30000);
 
     setHasSetupKeepAlive(true);
 
-    // Return cleanup function
     return () => clearInterval(intervalId);
   }, [pingServer]);
 
@@ -59,7 +57,7 @@ export const useAuroraWebsocket = () => {
 
   useEffect(() => {
     if (readyState === ReadyState.OPEN && !hasSetupKeepAlive) {
-      return setupKeepAlive(); // Return cleanup function
+      return setupKeepAlive();
     }
   }, [hasSetupKeepAlive, readyState, setupKeepAlive]);
 

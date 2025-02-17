@@ -13,7 +13,7 @@ export default function BotSettings(props: { params: Promise<any> }) {
   const { id } = params;
   const [bot, setBot] = useState<AuroraBot | null>(null);
 
-  const { data } = useQuery(GET_BOT_BY_ID, {
+  const { data, refetch } = useQuery(GET_BOT_BY_ID, {
     variables: { botId: id },
     skip: !id || !!bot,
     onCompleted: (data) => {
@@ -25,7 +25,7 @@ export default function BotSettings(props: { params: Promise<any> }) {
   return (
     <WsPageWrapper>
       <WsContentWrapper className="w-full max-w-2xl mx-auto pt-16">
-        {bot && <BotStrategyForm bot={bot} />}
+        {bot && <BotStrategyForm bot={bot} refetch={refetch} />}
       </WsContentWrapper>
     </WsPageWrapper>
   );
