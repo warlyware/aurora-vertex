@@ -11,7 +11,7 @@ import { useState } from "react";
 import Spinner from "../UI/spinner";
 import showToast from "@/utils/show-toast";
 import { BotStrategyInfo } from "./bot-strategy-info";
-import { BotStrategy } from "./bot-strategy-form";
+import { BotStrategy, Trader } from "./bot-strategy-form";
 
 
 type BotCardProps = {
@@ -31,6 +31,7 @@ type BotCardProps = {
     activeTraderStrategyUnion?: {
       id: string;
       strategy: BotStrategy;
+      trader: Trader;
     }
   };
   botStatus: any;
@@ -128,7 +129,10 @@ export function BotCard({
           {getAbbreviatedAddress(bot?.botWallet?.wallet?.keypair?.publicKey)}
         </Link>
       </div>
-      <BotStrategyInfo strategy={bot?.activeTraderStrategyUnion?.strategy} />
+      <BotStrategyInfo
+        strategy={bot?.activeTraderStrategyUnion?.strategy}
+        trader={bot?.activeTraderStrategyUnion?.trader}
+      />
       {/* <BotStatus status={botStatus} className="mb-4" /> */}
       <hr className="my-4" />
       <form onSubmit={formik.handleSubmit}>

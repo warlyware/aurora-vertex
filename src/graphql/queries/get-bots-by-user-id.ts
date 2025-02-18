@@ -27,6 +27,14 @@ query GET_BOTS_BY_USER_ID($userId: uuid) {
       id      
       traderId
       tradeStrategyId
+      trader {
+        id
+        name
+        wallet {
+          id
+          address
+        }
+      }
       strategy {
         name
         maxBuyAmount
