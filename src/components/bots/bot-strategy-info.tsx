@@ -36,6 +36,10 @@ export const BotStrategyInfo = ({ strategy }: { strategy: any }) => {
           <span>Eject On Buy</span>
           <span>{strategy.shouldEjectOnBuy ? <CheckCircleIcon className="h-4 w-4" /> : <XMarkIcon className="h-4 w-4" />}</span>
         </div>
+        <div className="flex gap-x-4">
+          <span>Eject On Curve</span>
+          <span>{strategy.shouldEjectOnCurve ? <CheckCircleIcon className="h-4 w-4" /> : <XMarkIcon className="h-4 w-4" />}</span>
+        </div>
       </div>
     </div>
   );

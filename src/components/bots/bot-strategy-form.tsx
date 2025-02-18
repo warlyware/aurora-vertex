@@ -9,8 +9,6 @@ import { BASE_URL } from "@/constants";
 import axios from "axios";
 import showToast from "@/utils/show-toast";
 import { GET_TRADER_STRATEGY_UNIONS_BY_BOT_ID } from "@/graphql/queries/get-trader-strategy-unions-by-bot-id";
-import { GET_TRADE_STRATEGY_BY_ID } from "@/graphql/queries/get-trade-strategy-by-id";
-import JSONPretty from "react-json-pretty";
 import { useState } from "react";
 
 export type Trader = {
@@ -26,8 +24,15 @@ export type AuroraBot = {
   id: string;
   name: string;
   ejectWalletId: string;
-
 }
+
+export type TraderStrategyUnion = {
+  id: string;
+  traderId: string;
+  tradeStrategyId: string;
+  strategy: BotStrategy;
+}
+
 
 export type BotStrategy = {
   id: string;
@@ -38,8 +43,12 @@ export type BotStrategy = {
   shouldCopyBuys: boolean;
   shouldCopySells: boolean;
   shouldEjectOnBuy: boolean;
+  shouldEjectOnCurve: boolean;
+  shouldSellOnCurve: boolean;
   traderId: string;
   priorityFee: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () => void }) => {
@@ -55,6 +64,8 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
       shouldCopyBuys: existingStrategy?.shouldCopyBuys || false,
       shouldCopySells: existingStrategy?.shouldCopySells || false,
       shouldEjectOnBuy: existingStrategy?.shouldEjectOnBuy || false,
+      shouldEjectOnCurve: existingStrategy?.shouldEjectOnCurve || false,
+      shouldSellOnCurve: existingStrategy?.shouldSellOnCurve || false,
       traderId: existingStrategy?.traderId || "",
       priorityFee: existingStrategy?.priorityFee || 0,
       name: existingStrategy?.name || "",
@@ -81,24 +92,7 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
   });
 
   useQuery<{
-    traderStrategies: {
-      id: string;
-      traderId: string;
-      tradeStrategyId: string;
-      strategy: {
-        maxBuyAmount: number;
-        stopLossPercentage: number;
-        takeProfitPercentage: number;
-        shouldCopyBuys: boolean;
-        shouldCopySells: boolean;
-        shouldEjectOnBuy: boolean;
-        priorityFee: number;
-        name: string;
-        id: string;
-        createdAt: string;
-        updatedAt: string;
-      };
-    }[];
+    traderStrategies: TraderStrategyUnion[];
   }>(GET_TRADER_STRATEGY_UNIONS_BY_BOT_ID, {
     variables: {
       botId: bot.id,
@@ -108,6 +102,8 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
       setExistingStrategy({
         ...traderStrategies[0]?.strategy,
         traderId: traderStrategies[0]?.traderId,
+        shouldEjectOnCurve: traderStrategies[0]?.strategy?.shouldEjectOnCurve,
+        shouldSellOnCurve: traderStrategies[0]?.strategy?.shouldSellOnCurve,
       });
 
       setFieldValue("traderId", traderStrategies[0]?.traderId);
@@ -119,6 +115,8 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
       setFieldValue("shouldEjectOnBuy", traderStrategies[0]?.strategy?.shouldEjectOnBuy);
       setFieldValue("priorityFee", traderStrategies[0]?.strategy?.priorityFee);
       setFieldValue("name", traderStrategies[0]?.strategy?.name);
+      setFieldValue("shouldEjectOnCurve", traderStrategies[0]?.strategy?.shouldEjectOnCurve);
+      setFieldValue("shouldSellOnCurve", traderStrategies[0]?.strategy?.shouldSellOnCurve);
     },
   });
 
@@ -173,20 +171,6 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
         <div className="flex items-center">
           <input
             type="checkbox"
-            checked={values.shouldEjectOnBuy}
-            onChange={(e) => {
-              setFieldValue("shouldEjectOnBuy", e.target.checked);
-            }}
-            className="h-4 w-4 rounded border-gray-700 bg-sky-950 text-blue-600"
-          />
-          <label className="ml-2 block text-sm text-gray-200">
-            Eject On Buy
-          </label>
-        </div>
-
-        <div className="flex items-center">
-          <input
-            type="checkbox"
             checked={values.shouldCopyBuys}
             onChange={(e) => {
               setFieldValue("shouldCopyBuys", e.target.checked);
@@ -206,9 +190,40 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
               setFieldValue("shouldCopySells", e.target.checked);
             }}
             className="h-4 w-4 rounded border-gray-700 bg-sky-950 text-blue-600"
+            disabled={values.shouldEjectOnBuy}
           />
           <label className="ml-2 block text-sm text-gray-200">
             Copy Sells
+          </label>
+        </div>
+
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            checked={values.shouldEjectOnBuy}
+            onChange={(e) => {
+              setFieldValue("shouldEjectOnBuy", e.target.checked);
+            }}
+            className="h-4 w-4 rounded border-gray-700 bg-sky-950 text-blue-600"
+            disabled={values.shouldEjectOnCurve}
+          />
+          <label className="ml-2 block text-sm text-gray-200">
+            Eject On Buy
+          </label>
+        </div>
+
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            checked={values.shouldEjectOnCurve}
+            onChange={(e) => {
+              setFieldValue("shouldEjectOnCurve", e.target.checked);
+            }}
+            className="h-4 w-4 rounded border-gray-700 bg-sky-950 text-blue-600"
+            disabled={values.shouldEjectOnBuy}
+          />
+          <label className="ml-2 block text-sm text-gray-200">
+            Eject On Curve
           </label>
         </div>
       </div>

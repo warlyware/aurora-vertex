@@ -11,6 +11,8 @@ export const GET_TRADE_STRATEGY_BY_ID = gql`
       shouldCopyBuys
       shouldCopySells
       shouldEjectOnBuy
+      shouldEjectOnCurve
+      shouldSellOnCurve
       priorityFee
     }
   }

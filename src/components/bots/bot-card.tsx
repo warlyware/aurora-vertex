@@ -10,20 +10,9 @@ import axios from "axios";
 import { useState } from "react";
 import Spinner from "../UI/spinner";
 import showToast from "@/utils/show-toast";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import JSONPretty from "react-json-pretty";
 import { BotStrategyInfo } from "./bot-strategy-info";
+import { BotStrategy } from "./bot-strategy-form";
 
-type BotStrategy = {
-  name: string;
-  maxBuyAmount: number;
-  stopLossPercentage: number;
-  takeProfitPercentage: number;
-  shouldCopyBuys: boolean;
-  shouldCopySells: boolean;
-  shouldEjectOnBuy: boolean;
-  priorityFee: number;
-}
 
 type BotCardProps = {
   bot: {

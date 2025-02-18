@@ -35,6 +35,8 @@ query GET_BOT_BY_ID($botId: uuid!) {
         shouldCopyBuys
         shouldCopySells
         shouldEjectOnBuy
+        shouldEjectOnCurve
+        shouldSellOnCurve
         priorityFee
         id
         createdAt

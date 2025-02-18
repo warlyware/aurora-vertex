@@ -21,6 +21,8 @@ export async function POST(req: NextRequest) {
     shouldCopyBuys,
     shouldCopySells,
     shouldEjectOnBuy,
+    shouldEjectOnCurve,
+    shouldSellOnCurve,
     priorityFee,
     botId,
   }: {
@@ -32,6 +34,8 @@ export async function POST(req: NextRequest) {
     shouldCopyBuys: boolean,
     shouldCopySells: boolean,
     shouldEjectOnBuy: boolean,
+    shouldEjectOnCurve: boolean,
+    shouldSellOnCurve: boolean,
     priorityFee: number,
     botId: string,
   } = await req?.json();
@@ -138,6 +142,8 @@ export async function POST(req: NextRequest) {
         shouldCopyBuys,
         shouldCopySells,
         shouldEjectOnBuy,
+        shouldEjectOnCurve,
+        shouldSellOnCurve,
         priorityFee,
       },
     },

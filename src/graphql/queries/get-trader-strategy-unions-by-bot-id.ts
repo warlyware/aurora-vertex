@@ -13,6 +13,8 @@ export const GET_TRADER_STRATEGY_UNIONS_BY_BOT_ID = gql`
         shouldCopyBuys
         shouldCopySells
         shouldEjectOnBuy
+        shouldEjectOnCurve
+        shouldSellOnCurve
         priorityFee
         name
         id
