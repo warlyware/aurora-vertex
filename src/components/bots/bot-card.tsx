@@ -1,7 +1,6 @@
 'use client'
-import { CheckCircleIcon, EyeIcon, EyeSlashIcon, PowerIcon, PencilIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, Cog6ToothIcon, PowerIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import classNames from "classnames";
 import { BotStatus } from "./bot-status";
 import { getAbbreviatedAddress } from "@/utils";
 import { FormInputWithLabel } from "../UI/forms/form-input-with-label";
@@ -12,6 +11,19 @@ import { useState } from "react";
 import Spinner from "../UI/spinner";
 import showToast from "@/utils/show-toast";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import JSONPretty from "react-json-pretty";
+import { BotStrategyInfo } from "./bot-strategy-info";
+
+type BotStrategy = {
+  name: string;
+  maxBuyAmount: number;
+  stopLossPercentage: number;
+  takeProfitPercentage: number;
+  shouldCopyBuys: boolean;
+  shouldCopySells: boolean;
+  shouldEjectOnBuy: boolean;
+  priorityFee: number;
+}
 
 type BotCardProps = {
   bot: {
@@ -26,6 +38,10 @@ type BotCardProps = {
     }
     ejectWallet?: {
       address: string;
+    }
+    activeTraderStrategyUnion?: {
+      id: string;
+      strategy: BotStrategy;
     }
   };
   botStatus: any;
@@ -123,8 +139,9 @@ export function BotCard({
           {getAbbreviatedAddress(bot?.botWallet?.wallet?.keypair?.publicKey)}
         </Link>
       </div>
-      <BotStatus status={botStatus} className="mb-4" />
-      <hr className="mb-4" />
+      <BotStrategyInfo strategy={bot?.activeTraderStrategyUnion?.strategy} />
+      {/* <BotStatus status={botStatus} className="mb-4" /> */}
+      <hr className="my-4" />
       <form onSubmit={formik.handleSubmit}>
         <div className="flex py-2 space-x-2 items-end justify-between">
           <FormInputWithLabel

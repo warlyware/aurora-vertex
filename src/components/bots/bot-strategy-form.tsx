@@ -12,7 +12,6 @@ import { GET_TRADER_STRATEGY_UNIONS_BY_BOT_ID } from "@/graphql/queries/get-trad
 import { GET_TRADE_STRATEGY_BY_ID } from "@/graphql/queries/get-trade-strategy-by-id";
 import JSONPretty from "react-json-pretty";
 import { useState } from "react";
-import Spinner from "../UI/spinner";
 
 export type Trader = {
   id: string;
@@ -45,7 +44,6 @@ export type BotStrategy = {
 
 export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () => void }) => {
   const [existingStrategy, setExistingStrategy] = useState<BotStrategy | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const { data: traders } = useQuery(GET_TRADERS);
 
@@ -123,10 +121,6 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
       setFieldValue("name", traderStrategies[0]?.strategy?.name);
     },
   });
-
-  if (isLoading) {
-    return <Spinner />;
-  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

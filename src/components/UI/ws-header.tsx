@@ -6,6 +6,7 @@ import classNames from "classnames";
 import { useCallback, useEffect, useState } from "react";
 import { ReadyState } from "react-use-websocket";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const {
   PONG,
@@ -90,10 +91,12 @@ export const WsHeader = () => {
 
   return (
     <div className="top-0 w-full flex justify-between items-center p-4 space-x-4 h-12 absolute">
-      <div className="flex items-center">
-        <div className="flex items-center space-x-1">
-
-        </div>
+      <div className="flex items-center space-x-4 mx-4">
+        {links.map((link) => (
+          <Link key={link.href} href={link.href} className="text-gray-400 text-xs uppercase tracking-widest">
+            {link.label}
+          </Link>
+        ))}
       </div>
       <div className="flex items-center space-x-4 mr-4 text-gray-400 text-xs">
         <div className="flex items-center space-x-1">

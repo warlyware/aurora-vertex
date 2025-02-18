@@ -21,5 +21,25 @@ query GET_BOT_BY_ID($botId: uuid!) {
     user {
       id
     }
+      
+    activeTraderStrategyId
+    activeTraderStrategyUnion {
+      id      
+      traderId
+      tradeStrategyId
+      strategy {
+        name
+        maxBuyAmount
+        stopLossPercentage
+        takeProfitPercentage
+        shouldCopyBuys
+        shouldCopySells
+        shouldEjectOnBuy
+        priorityFee
+        id
+        createdAt
+        updatedAt
+      }
+    }
   }
 }`;
