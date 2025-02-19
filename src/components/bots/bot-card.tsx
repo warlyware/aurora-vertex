@@ -1,7 +1,6 @@
 'use client'
 import { CheckCircleIcon, Cog6ToothIcon, PowerIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { BotStatus } from "./bot-status";
 import { getAbbreviatedAddress } from "@/utils";
 import { FormInputWithLabel } from "../UI/forms/form-input-with-label";
 import { useFormik } from "formik";
@@ -12,7 +11,7 @@ import Spinner from "../UI/spinner";
 import showToast from "@/utils/show-toast";
 import { BotStrategyInfo } from "./bot-strategy-info";
 import { BotStrategy, Trader } from "./bot-strategy-form";
-
+import { BotStatus } from "./bot-status";
 
 type BotCardProps = {
   bot: {
@@ -88,8 +87,8 @@ export function BotCard({
   return (
     <div className="w-full p-2 px-4 bg-sky-950 rounded-lg">
       <div className="flex flex-col">
-        <div className="flex justify-between space-x-2 mb-2 items-center">
-          <div className="flex items-center">
+        <div className="flex justify-between space-x-2 mb-3 items-center">
+          <div className="flex items-center gap-x-4">
             <div className="flex items-center">
               {botStatus?.isActive ? (
                 <div className="bg-green-600 h-3 w-3 rounded-full shadow-inner" />
@@ -98,6 +97,12 @@ export function BotCard({
               )}
             </div>
             <div className="font-bold ml-2">{bot.name}</div>
+            <Link
+              className="text-sm underline w-fit"
+              href={`/wallet/${bot?.botWallet?.wallet?.keypair?.publicKey}`}
+            >
+              {getAbbreviatedAddress(bot?.botWallet?.wallet?.keypair?.publicKey)}
+            </Link>
           </div>
           <div className="flex space-x-2 items-center">
             {/* broke on refactor */}
@@ -122,18 +127,12 @@ export function BotCard({
             </button>
           </div>
         </div>
-        <Link
-          className="text-sm underline mb-4 w-fit"
-          href={`/wallet/${bot?.botWallet?.wallet?.keypair?.publicKey}`}
-        >
-          {getAbbreviatedAddress(bot?.botWallet?.wallet?.keypair?.publicKey)}
-        </Link>
       </div>
       <BotStrategyInfo
         strategy={bot?.activeTraderStrategyUnion?.strategy}
         trader={bot?.activeTraderStrategyUnion?.trader}
       />
-      {/* <BotStatus status={botStatus} className="mb-4" /> */}
+      <BotStatus status={botStatus} className="mb-4" />
       <hr className="my-4" />
       <form onSubmit={formik.handleSubmit}>
         <div className="flex py-2 space-x-2 items-end justify-between">

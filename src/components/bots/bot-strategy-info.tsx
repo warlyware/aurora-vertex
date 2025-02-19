@@ -18,8 +18,12 @@ export const BotStrategyInfo = ({ strategy, trader }: { strategy: BotStrategy | 
       <div className="text-xs flex justify-between gap-x-4 max-w-[300px]">
         <div className="flex flex-col gap-y-2">
           <div className="flex gap-x-4">
+            <span>Intended Trade Ratio</span>
+            <span>{(strategy.intendedTradeRatio || 0) * 100}%</span>
+          </div>
+          <div className="flex gap-x-4">
             <span>Max Buy</span>
-            <span>{strategy.maxBuyAmount} SOL</span>
+            <span>{strategy.maxBuyAmount || 0} SOL</span>
           </div>
           <div className="flex gap-x-4">
             <span>Stop Loss</span>
@@ -35,6 +39,10 @@ export const BotStrategyInfo = ({ strategy, trader }: { strategy: BotStrategy | 
           </div>
         </div>
         <div className="flex flex-col gap-y-2">
+          <div className="flex gap-x-4">
+            <span>Slippage</span>
+            <span>{strategy.slippagePercentage || 0}%</span>
+          </div>
           <div className="flex gap-x-4">
             <span>Copy Buys</span>
             <span>{strategy.shouldCopyBuys ? <CheckCircleIcon className="h-4 w-4" /> : <XMarkIcon className="h-4 w-4" />}</span>

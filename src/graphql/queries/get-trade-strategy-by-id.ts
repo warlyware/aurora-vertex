@@ -14,6 +14,8 @@ export const GET_TRADE_STRATEGY_BY_ID = gql`
       shouldEjectOnCurve
       shouldSellOnCurve
       priorityFee
+      slippagePercentage
+      intendedTradeRatio
     }
   }
 `;

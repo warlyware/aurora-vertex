@@ -49,6 +49,8 @@ export type BotStrategy = {
   priorityFee: number;
   createdAt: string;
   updatedAt: string;
+  slippagePercentage?: number;
+  intendedTradeRatio?: number;
 }
 
 export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () => void }) => {
@@ -70,6 +72,8 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
       priorityFee: existingStrategy?.priorityFee || 0,
       name: existingStrategy?.name || "",
       botId: bot.id,
+      slippagePercentage: existingStrategy?.slippagePercentage || 0,
+      intendedTradeRatio: existingStrategy?.intendedTradeRatio || 0,
     },
     onSubmit: async (values) => {
       console.log(values);
@@ -117,6 +121,8 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
       setFieldValue("name", traderStrategies[0]?.strategy?.name);
       setFieldValue("shouldEjectOnCurve", traderStrategies[0]?.strategy?.shouldEjectOnCurve);
       setFieldValue("shouldSellOnCurve", traderStrategies[0]?.strategy?.shouldSellOnCurve);
+      setFieldValue("slippagePercentage", traderStrategies[0]?.strategy?.slippagePercentage);
+      setFieldValue("intendedTradeRatio", traderStrategies[0]?.strategy?.intendedTradeRatio);
     },
   });
 
@@ -135,6 +141,15 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
         placeholder="select target"
         hideLabel={false}
       />
+
+      <FormInputWithLabel
+        label="Intended Trade Ratio"
+        name="intendedTradeRatio"
+        type="number"
+        value={values.intendedTradeRatio}
+        onChange={handleChange}
+      />
+
       <FormInputWithLabel
         label="Max Buy Amount (SOL)"
         name="maxBuyAmount"
@@ -164,6 +179,14 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
         name="priorityFee"
         type="number"
         value={values.priorityFee}
+        onChange={handleChange}
+      />
+
+      <FormInputWithLabel
+        label="Slippage (%)"
+        name="slippagePercentage"
+        type="number"
+        value={values.slippagePercentage}
         onChange={handleChange}
       />
 

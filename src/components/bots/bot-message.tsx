@@ -27,7 +27,7 @@ export const BotMessage = (props: {
 
 
   return (
-    <div className="p-2 bg-sky-950 rounded-lg flex flex-col gap-y-2 bg-opacity-50">
+    <div className="p-2 bg-black rounded-lg flex flex-col gap-y-2 bg-opacity-50 text-sm">
       <div className="text-gray-200 mb-4">
         {message?.info ? message.info
           .replace(/[1-9A-HJ-NP-Za-km-z]{32,44}/g, (sig: string) =>
@@ -55,13 +55,14 @@ export const BotMessage = (props: {
           ))}
         </div>
       }
-      {message?.data &&
+
+      {/* {message?.data &&
         <ReactJson
           collapsed={true}
           theme="twilight"
           src={message.data}
         />
-      }
+      } */}
 
       <div className="flex justify-between items-center">
         <div className="text-xs text-gray-400">{message.botId}</div>

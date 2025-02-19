@@ -46,6 +46,8 @@ query GET_BOTS_BY_USER_ID($userId: uuid) {
         shouldEjectOnCurve
         shouldSellOnCurve
         priorityFee
+        slippagePercentage
+        intendedTradeRatio
         id
         createdAt
         updatedAt

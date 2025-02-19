@@ -24,6 +24,8 @@ export async function POST(req: NextRequest) {
     shouldEjectOnCurve,
     shouldSellOnCurve,
     priorityFee,
+    slippagePercentage,
+    intendedTradeRatio,
     botId,
   }: {
     name: string,
@@ -37,6 +39,8 @@ export async function POST(req: NextRequest) {
     shouldEjectOnCurve: boolean,
     shouldSellOnCurve: boolean,
     priorityFee: number,
+    slippagePercentage: number,
+    intendedTradeRatio: number,
     botId: string,
   } = await req?.json();
 
@@ -111,20 +115,6 @@ export async function POST(req: NextRequest) {
     }
 
     console.log({ bot });
-
-    await client.request({
-      document: DELETE_TRADER_STRATEGY_UNION,
-      variables: {
-        id: traderStrategies[0].id,
-      },
-    });
-
-    await client.request({
-      document: DELETE_TRADE_STRATEGY,
-      variables: {
-        id: traderStrategies[0].id,
-      },
-    });
   }
 
   const { insert_tradeStrategies_one }: {
@@ -145,6 +135,8 @@ export async function POST(req: NextRequest) {
         shouldEjectOnCurve,
         shouldSellOnCurve,
         priorityFee,
+        slippagePercentage,
+        intendedTradeRatio,
       },
     },
   });
@@ -201,6 +193,22 @@ export async function POST(req: NextRequest) {
       status: 400,
       body: {
         error: "Failed to add trader strategy union",
+      },
+    });
+  }
+
+  if (IS_ONLY_ONE_STRATEGY_PER_BOT) {
+    await client.request({
+      document: DELETE_TRADER_STRATEGY_UNION,
+      variables: {
+        id: traderStrategies[0].id,
+      },
+    });
+
+    await client.request({
+      document: DELETE_TRADE_STRATEGY,
+      variables: {
+        id: traderStrategies[0].id,
       },
     });
   }
