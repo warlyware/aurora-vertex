@@ -1,9 +1,12 @@
 import { getAbbreviatedAddress } from "@/utils"
 import { getSolscanAccountUrl } from "@/utils/urls"
-import { FormattedTxAction } from "./SolanaTxNotificationSummary"
 
 export const SolanaTransferSummary = (props: {
-  action: FormattedTxAction
+  action: {
+    txSource: string;
+    txDestination: string;
+    transferAmount: number;
+  }
 }) => {
   const { action } = props;
   return (

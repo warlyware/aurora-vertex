@@ -2,7 +2,7 @@ import { SolanaTxNotificationType } from "@/types/helius"
 import JSONPretty from "react-json-pretty";
 
 export const SolanaTxNotificationDetailInstruction = (props: {
-  instruction: SolanaTxNotificationType['payload']['params']['result']['transaction']['transaction']['message']['instructions'][0]
+  instruction: SolanaTxNotificationType['payload']['tx']['params']['result']['transaction']['transaction']['message']['instructions'][0]
 }) => {
   const { instruction } = props;
 

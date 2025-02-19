@@ -1,11 +1,14 @@
 import { getSolscanAccountUrl } from "@/utils/urls";
-import { FormattedTxAction } from "./SolanaTxNotificationSummary";
 import { getAbbreviatedAddress } from "@/utils";
 import { addCommasToNumber } from "@/utils/formatting";
 import JSONPretty from "react-json-pretty";
 
 export const PumpfunBuySellSummary = (props: {
-  action: FormattedTxAction
+  action: {
+    name: string;
+    transferAmount: number;
+    mint: string;
+  }
 }) => {
   const { action } = props;
   return (

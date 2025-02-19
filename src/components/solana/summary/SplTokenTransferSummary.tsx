@@ -1,10 +1,14 @@
 import { getSolscanAccountUrl } from "@/utils/urls";
-import { FormattedTxAction } from "./SolanaTxNotificationSummary";
 import { getAbbreviatedAddress } from "@/utils";
 import { addCommasToNumber } from "@/utils/formatting";
 
 export const SplTokenTransferSummary = (props: {
-  action: FormattedTxAction
+  action: {
+    txSource: string;
+    txDestination: string;
+    transferAmount: number;
+    mint: string;
+  }
 }) => {
   const { action } = props;
   return (
