@@ -61,11 +61,11 @@ export default function Page() {
       {isLoading ? <Spinner /> : (
         <WsPageWrapper>
           <WsContentWrapper className="flex w-full">
-            <BotCardList
+            {/* <BotCardList
               bots={bots}
               visibleLogBotIds={visibleLogBotIds}
               onToggleVisibility={setVisibleLogBotIds}
-            />
+            /> */}
             <BotEventsFeed
               visibleLogBotIds={visibleLogBotIds}
             />
