@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export const Logo = ({ width = 500, height = 500 }) => {
+export const Logo = ({ width = 200, height = 200 }) => {
   return (
     <Image
       src="/images/logo.png"

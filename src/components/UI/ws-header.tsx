@@ -91,18 +91,18 @@ export const WsHeader = () => {
 
   return (
     <div className="top-0 w-full flex justify-between items-center p-4 space-x-4 h-12 absolute bg-black gotu">
-      <div className="flex items-center space-x-4 mx-4 mr-8 tracking-[4px]">
+      <div className="flex items-center space-x-4 mx-4 mr-8 tracking-[6px] pt-[3px]">
         fake
       </div>
 
-      <div className="flex items-center space-x-4 mx-4">
+      <div className="flex items-center space-x-4 mx-4 pt-[3px]">
         {links.map((link) => (
           <Link key={link.href} href={link.href} className="text-gray-400 text-xs uppercase tracking-widest">
             {link.label}
           </Link>
         ))}
       </div>
-      <div className="flex items-center space-x-4 mr-4 text-gray-400 text-xs">
+      <div className="flex items-center space-x-4 mr-4 text-gray-400 text-xs pt-[3px]">
         <div className="flex items-center space-x-1">
           <div>server: </div>
           <div className="flex justify-end min-w-[32px]">{latencyInMs}ms</div>
