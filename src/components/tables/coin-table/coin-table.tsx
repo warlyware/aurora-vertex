@@ -73,9 +73,8 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         accessorKey: "liquidity",
         cell: (info) => (
           <div className="flex flex-col px-4">
-            <div className="truncate">{`$${
-              Number(info?.getValue()).toFixed(2) ?? 0
-            }`}</div>
+            <div className="truncate">{`$${Number(info?.getValue()).toFixed(2) ?? 0
+              }`}</div>
           </div>
         ),
       },
@@ -212,7 +211,7 @@ export const CoinTable = ({ coins }: { coins: Coin[] }) => {
         }}
         fixedHeaderContent={() => {
           return table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="bg-blue-700">
+            <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
                   <th

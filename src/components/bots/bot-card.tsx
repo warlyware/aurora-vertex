@@ -85,7 +85,7 @@ export function BotCard({
   }
 
   return (
-    <div className="w-full p-2 px-4 bg-sky-950 rounded-lg">
+    <div className="w-full p-2 px-4 bg-black rounded-lg border border-gray-800">
       <div className="flex flex-col">
         <div className="flex justify-between space-x-2 mb-3 items-center">
           <div className="flex items-center gap-x-4">
@@ -93,7 +93,7 @@ export function BotCard({
               {botStatus?.isActive ? (
                 <div className="bg-green-600 h-3 w-3 rounded-full shadow-inner" />
               ) : (
-                <div className="bg-red-600 h-3 w-3 rounded-full shadow-inner" />
+                <div className="bg-pink-700 h-3 w-3 rounded-full shadow-inner" />
               )}
             </div>
             <div className="font-bold ml-2">{bot.name}</div>

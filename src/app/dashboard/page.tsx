@@ -5,9 +5,13 @@ import Link from "next/link";
 import WsPageWrapper from "@/components/UI/ws-page-wrapper";
 import WsContentWrapper from "@/components/UI/ws-content-wrapper";
 import dynamic from 'next/dynamic';
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_BOTS_BY_USER_ID } from "@/graphql/queries/get-bots-by-user-id";
+import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
+import { useAuroraWebsocket } from "@/hooks/use-aurora-websocket";
+
+const { BOT_SPAWN, BOT_STOP, BOT_TRADE_NOTIFICATION, BOT_LOG_EVENT, BOT_STATUS_UPDATE } = messageTypes;
 
 // Dynamic imports with ssr: false
 const ServerLogsFeed = dynamic(
@@ -32,10 +36,13 @@ const BotCardList = dynamic(
 
 export default function Dashboard() {
   const user = useUserData();
+  const { sendMessage, lastMessage } = useAuroraWebsocket();
 
   const [visibleLogBotIds, setVisibleLogBotIds] = useState<string[]>([]);
   const [bots, setBots] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [botLogs, setBotLogs] = useState<any[]>([]);
+  const [botStatus, setBotStatus] = useState<Record<string, any>>({});
 
   const { loading } = useQuery(GET_BOTS_BY_USER_ID, {
     variables: { userId: user?.id },
@@ -47,42 +54,101 @@ export default function Dashboard() {
     }
   });
 
+  const handleMessageData = useCallback(({ type, payload }: AuroraMessage) => {
+    console.log("handleMessageData", { type, payload });
+    switch (type) {
+      case BOT_TRADE_NOTIFICATION:
+        setBotLogs(prev => [...prev, payload]);
+        break;
+      case BOT_LOG_EVENT:
+        setBotLogs(prev => [...prev, payload]);
+        break;
+      case BOT_STATUS_UPDATE:
+        setBotStatus(prev => ({
+          ...prev,
+          [payload.botId]: payload,
+        }));
+        break;
+    }
+  }, []);
+
+  const spawnBot = useCallback(
+    (botId: string) => {
+      sendMessage(
+        JSON.stringify({
+          type: BOT_SPAWN,
+          payload: {
+            botId,
+            strategy: 'DEFAULT',
+          },
+        })
+      );
+    },
+    [sendMessage]
+  );
+
+  const stopBot = useCallback(
+    (botId: string) => {
+      sendMessage(
+        JSON.stringify({
+          type: BOT_STOP,
+          payload: {
+            botId,
+          },
+        })
+      );
+    },
+    [sendMessage]
+  );
+
+  useEffect(() => {
+    if (lastMessage) {
+      try {
+        handleMessageData(JSON.parse(lastMessage.data));
+      } catch (e) { }
+    }
+  }, [lastMessage, handleMessageData]);
+
   return (
     <>
-      {!!user?.id ? (
+      {!!user?.id && !isLoading ? (
         <WsPageWrapper>
-          <WsContentWrapper
-            className="flex flex-col w-full"
-          >
-            <div className="flex w-full h-96 bg-gray-100 rounded-lg bg-opacity-30">
+          <WsContentWrapper className="flex flex-col w-full">
+            <div className="flex w-full h-[400px] bg-gray-900 rounded-lg bg-opacity-30">
               <BotCardList
                 bots={bots}
+                botStatus={botStatus}
+                botLogs={botLogs}
                 visibleLogBotIds={visibleLogBotIds}
                 onToggleVisibility={setVisibleLogBotIds}
+                onBotAction={(botId: string, action: 'spawn' | 'stop') => {
+                  if (action === 'spawn') {
+                    spawnBot(botId);
+                  } else {
+                    stopBot(botId);
+                  }
+                }}
               />
             </div>
             <div className="flex w-full" style={{ height: 'calc(100% - 384px)' }}>
-              <div className="flex flex-col w-1/3 bg-slate-500 bg-opacity-30 overflow-y-auto p-4">
+              <div className="flex flex-col w-1/3 bg-black overflow-y-auto p-4">
                 <div className="text-lg">Server Logs</div>
                 <ServerLogsFeed />
               </div>
-              <div className="flex flex-col w-1/3 bg-yellow-500 bg-opacity-30 p-4">
+              <div className="flex flex-col w-1/3 bg-black p-4 border-x border-pink-900">
                 <div className="text-lg">Solana Tx Events</div>
                 <SolanaTxEventsFeed />
               </div>
-              <div className="flex flex-col w-1/3 bg-green-500 bg-opacity-30 overflow-y-auto p-4">
+              <div className="flex flex-col w-1/3 bg-black overflow-y-auto p-4">
                 <div className="text-lg">Bot Activity</div>
                 <BotEventsFeed visibleLogBotIds={visibleLogBotIds} />
               </div>
             </div>
-
           </WsContentWrapper>
         </WsPageWrapper>
       ) : (
         <Link href="/login">
-          <div className="mt-16">
-            <Logo />
-          </div>
+          <Logo />
         </Link>
       )}
     </>

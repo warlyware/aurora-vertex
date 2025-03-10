@@ -121,9 +121,7 @@ export default function TraderDetailPage() {
           </>
         ) : (
           <Link href="/login">
-            <div className="mt-16">
-              <Logo />
-            </div>
+            <Logo />
           </Link>
         )}
       </PageWrapper>

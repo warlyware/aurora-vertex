@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Gotu } from "next/font/google";
 import "./globals.css";
 import { ContextProvider } from "@/providers/context-provider";
 import classNames from "classnames";
 import Toaster from "@/components/UI/toasts/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
+const gotu = Gotu({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AURORA VERTEX",
-  description: "AURORA VERTEX",
+  title: "F A K E",
+  description: "F A K E",
 };
 
 export default function RootLayout({
@@ -19,8 +20,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={classNames([inter.className, "bg-blue-700"])}>
-        <main className="flex min-h-screen flex-col items-center">
+      <body className={classNames([inter.className])}>
+        <main className="flex min-h-screen flex-col items-center justify-center gotu">
           <ContextProvider>
             {children}
             <Toaster />

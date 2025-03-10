@@ -217,7 +217,7 @@ export const LiquidityPoolTable = ({
         }}
         fixedHeaderContent={() => {
           return table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="bg-blue-700 overflow-auto">
+            <tr key={headerGroup.id} className="overflow-auto">
               {headerGroup.headers.map((header) => {
                 return (
                   <th

@@ -165,7 +165,7 @@ export const RawCoinTable = ({ coins }: { coins: any[] }) => {
         }}
         fixedHeaderContent={() => {
           return table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="bg-blue-700">
+            <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
                   <th

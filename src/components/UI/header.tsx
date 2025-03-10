@@ -12,7 +12,7 @@ export const Header = () => {
     <div className="flex p-4 px-9 mx-auto w-full justify-between items-center text-sm uppercase h-16 z-10 fixed">
       <div className="flex w-full space-x-8 items-center">
         <Link href="/dashboard" className="mr-8">
-          aurora vertex
+          f a k e
         </Link>
         <Link href="/wallet">my wallets</Link>
         <Link href="/wallet-watchlist">watched wallets</Link>
