@@ -86,7 +86,7 @@ export default function TradersList() {
 
   return (
     <WsPageWrapper>
-      <WsPageContent className="max-w-4xl mx-auto">
+      <WsPageContent className="max-w-4xl mx-auto mt-24">
         <AddTraderForm refetch={fetchTraders} className="mb-8" />
         {
           !!traders?.length && traders.map((trader: Trader) => {

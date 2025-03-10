@@ -7,7 +7,7 @@ export const Logo = ({ width = 500, height = 500 }) => {
       alt="logo"
       width={width}
       height={height}
-      className="rounded-full border-4 border-green-500"
+      className="rounded-full border-2 border-pink-600"
     />
   );
 };

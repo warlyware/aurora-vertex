@@ -132,15 +132,15 @@ export default function Dashboard() {
             </div>
             <div className="flex w-full" style={{ height: 'calc(100% - 384px)' }}>
               <div className="flex flex-col w-1/3 bg-black overflow-y-auto p-4">
-                <div className="text-lg">Server Logs</div>
+                <div className="text-lg gotu">Server Logs</div>
                 <ServerLogsFeed />
               </div>
               <div className="flex flex-col w-1/3 bg-black p-4 border-x border-pink-900">
-                <div className="text-lg">Solana Tx Events</div>
+                <div className="text-lg gotu">Solana Tx Events</div>
                 <SolanaTxEventsFeed />
               </div>
               <div className="flex flex-col w-1/3 bg-black overflow-y-auto p-4">
-                <div className="text-lg">Bot Activity</div>
+                <div className="text-lg gotu">Bot Activity</div>
                 <BotEventsFeed visibleLogBotIds={visibleLogBotIds} />
               </div>
             </div>

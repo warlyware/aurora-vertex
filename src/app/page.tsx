@@ -1,6 +1,5 @@
 "use client";
 
-import CenterContentWrapper from "@/components/UI/center-content-wrapper";
 import CenterPageContentWrapper from "@/components/UI/center-page-content-wrapper";
 import { Logo } from "@/components/UI/logo";
 import { PageWrapper } from "@/components/UI/page-wrapper";

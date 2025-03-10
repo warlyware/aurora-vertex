@@ -25,7 +25,7 @@ export const SolanaTxNotification = (props: {
   }
 
   return (
-    <div key={index} className=" bg-sky-900 rounded-lg flex flex-col gap-y-4 bg-opacity-30 p-4">
+    <div key={index} className=" bg-gray-800 rounded-lg flex flex-col gap-y-4 bg-opacity-60 p-4">
       <SolanaTxNotificationDetails message={message} showExtended={showExtended} />
       <div className="flex space-x-2 items-center">
         <button

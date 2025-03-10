@@ -9,8 +9,8 @@ const inter = Inter({ subsets: ["latin"] });
 const gotu = Gotu({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "F A K E",
-  description: "F A K E",
+  title: "fake",
+  description: "fake",
 };
 
 export default function RootLayout({
@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={classNames([inter.className])}>
-        <main className="flex min-h-screen flex-col items-center justify-center gotu">
+        <main className="flex min-h-screen flex-col items-center justify-center">
           <ContextProvider>
             {children}
             <Toaster />
