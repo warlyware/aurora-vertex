@@ -11,12 +11,16 @@ import { addCommasToNumber } from "@/utils/formatting";
 import { useUserData } from "@nhost/nextjs";
 import axios from "axios";
 import { useEffect, useState, use, useCallback } from "react";
-
+import { ArrowUpRightIcon, BanknotesIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
+import { useQuery } from "@apollo/client";
+import { GET_BOT_BY_WALLET_ADDRESS } from "@/graphql/queries/get-bot-by-wallet-address";
+import showToast from "@/utils/show-toast";
 export default function WalletDetails(props: { params: Promise<any> }) {
   const params = use(props.params);
   const [wallet, setWallet] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const user = useUserData();
+  const [bot, setBot] = useState<any>(null);
 
   const { id } = params;
 
@@ -31,6 +35,35 @@ export default function WalletDetails(props: { params: Promise<any> }) {
 
     fetchWallet();
   }, [id]);
+
+  const { data: botData, refetch } = useQuery(GET_BOT_BY_WALLET_ADDRESS, {
+    variables: { address: id },
+    skip: !id,
+    onCompleted: (data) => {
+      console.log(data);
+      if (!data.bots.length) {
+        return;
+      }
+      setBot(data.bots[0]);
+    },
+  });
+
+  const handleSellAllTokens = async () => {
+    console.log("sell all tokens");
+    showToast({
+      primaryMessage: "Selling all tokens",
+    });
+    const { data } = await axios.post(
+      `${AURORA_VERTEX_API_URL}/sell-all-on-pumpfun`,
+      {
+        botId: bot?.id,
+        apiKey: AURORA_VERTEX_FRONTEND_API_KEY,
+        priorityFeeInLamports: 0,
+      }
+    );
+
+    console.log(data);
+  };
 
   if (!isLoading && !wallet) {
     return (
@@ -50,13 +83,30 @@ export default function WalletDetails(props: { params: Promise<any> }) {
   return (
     <WsPageWrapper>
       <WsContentWrapper className="flex flex-col items-center justify-center w-full">
-        <div className="text-3xl mb-8 flex items-center justify-center space-x-4">
+        <div className="text-2xl mb-2 flex items-center justify-center space-x-4">
           <div>{getAbbreviatedAddress(id)}</div>
-
           <CopyToClipboardButton text={id} />
+          <button
+            className="text-gray-500 hover:text-gray-700"
+            onClick={handleSellAllTokens}
+          >
+            <BanknotesIcon className="w-4 h-4" />
+          </button>
+          <a
+            className="text-gray-500 hover:text-gray-700"
+            href={`https://gmgn.ai/sol/address/${id}`}
+            target="_blank"
+          >
+            <GlobeAltIcon className="w-4 h-4" />
+          </a>
         </div>
-        <div className="text-xl mb-4">{wallet?.balances?.sol} SOL</div>
-        <div className="text-xl mb-4">{wallet?.balances?.lamports} lamports</div>
+        {bot && (
+          <div className="mb-4 italic">
+            {bot.name}
+          </div>
+        )}
+        <div className="text-lg mb-4">{wallet?.balances?.sol} SOL</div>
+        <div className="text-lg mb-4">{wallet?.balances?.lamports} lamports</div>
         {!!wallet?.balances?.splTokens?.length && (
           <div className="max-w-md mx-auto w-full text-lg">
             {wallet?.balances?.splTokens
