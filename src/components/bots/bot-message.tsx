@@ -11,6 +11,7 @@ export type BotLogMessage = {
   quantity?: number;
   info?: any;
   data?: any;
+  meta?: any;
   actions?: {
     type: string;
     description: string;
@@ -39,6 +40,17 @@ export const BotMessage = (props: {
           ))
           : message.info}
       </div>
+
+      {message?.meta?.tokenMint && message?.meta?.sendSignature && (
+        <div className="flex flex-col gap-y-4">
+          <div className="text-gray-400 italic text-sm">
+            Ejected {message.meta.tokenAmount} of&nbsp;
+            <a href={`https://gmgn.ai/sol/token/${message.meta.tokenMint}`} target="_blank" rel="noopener noreferrer">
+              {message.meta.tokenMint}
+            </a>
+          </div>
+        </div>
+      )}
       {message?.data?.actions &&
         <div className="flex flex-col gap-y-4">
           {message.data?.actions?.map((action: any, i: number) => (
@@ -56,13 +68,21 @@ export const BotMessage = (props: {
         </div>
       }
 
-      {/* {message?.data &&
+      {message?.data &&
         <ReactJson
           collapsed={true}
           theme="twilight"
           src={message.data}
         />
-      } */}
+      }
+
+      {message?.meta &&
+        <ReactJson
+          collapsed={true}
+          theme="twilight"
+          src={message.meta}
+        />
+      }
 
       <div className="flex justify-between items-center">
         <div className="text-xs text-gray-400">{message.botId}</div>

@@ -25,13 +25,13 @@ const showToast = ({
 
   toast.custom(
     <div
-      className="flex max-w-sm flex-col rounded-lg p-4 text-center text-xl"
+      className="flex max-w-sm flex-col rounded-lg p-4 text-center text-xl mt-8"
       style={{
         color: "#f3f4f6",
-        backgroundColor: "#010a25", // blue-700
+        backgroundColor: "#000",
       }}
     >
-      <div className="text-stone-800 font-bold">{primaryMessage}</div>
+      <div className="text-gray-200 font-bold">{primaryMessage}</div>
       {secondaryMessage && <div>{secondaryMessage}</div>}
       {link && (
         <a

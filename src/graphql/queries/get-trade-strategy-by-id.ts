@@ -13,6 +13,8 @@ export const GET_TRADE_STRATEGY_BY_ID = gql`
       shouldEjectOnBuy
       shouldEjectOnCurve
       shouldSellOnCurve
+      shouldAutoSell
+      autoSellDelayInMs
       priorityFee
       slippagePercentage
       intendedTradeRatio

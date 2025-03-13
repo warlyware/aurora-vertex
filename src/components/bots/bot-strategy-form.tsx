@@ -43,6 +43,8 @@ export type BotStrategy = {
   shouldCopyBuys: boolean;
   shouldCopySells: boolean;
   shouldEjectOnBuy: boolean;
+  shouldAutoSell: boolean;
+  autoSellDelayInMs?: number;
   shouldEjectOnCurve: boolean;
   shouldSellOnCurve: boolean;
   traderId: string;
@@ -66,6 +68,8 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
       shouldCopyBuys: existingStrategy?.shouldCopyBuys || false,
       shouldCopySells: existingStrategy?.shouldCopySells || false,
       shouldEjectOnBuy: existingStrategy?.shouldEjectOnBuy || false,
+      shouldAutoSell: existingStrategy?.shouldAutoSell || false,
+      autoSellDelayInMs: existingStrategy?.autoSellDelayInMs || 0,
       shouldEjectOnCurve: existingStrategy?.shouldEjectOnCurve || false,
       shouldSellOnCurve: existingStrategy?.shouldSellOnCurve || false,
       traderId: existingStrategy?.traderId || "",
@@ -77,8 +81,20 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
     },
     onSubmit: async (values) => {
       console.log(values);
+      if (values.shouldEjectOnBuy) {
+        values.shouldCopySells = false;
+      }
+
+      if (values.intendedTradeRatio > 1) {
+        showToast({
+          primaryMessage: "Intended trade ratio must be 1 or less",
+        });
+        return;
+      }
+
       const { data } = await axios.post(`${BASE_URL}/api/add-strategy`, values);
       console.log(data);
+
 
       if (data.status === 200) {
         showToast({
@@ -108,6 +124,8 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
         traderId: traderStrategies[0]?.traderId,
         shouldEjectOnCurve: traderStrategies[0]?.strategy?.shouldEjectOnCurve,
         shouldSellOnCurve: traderStrategies[0]?.strategy?.shouldSellOnCurve,
+        shouldAutoSell: traderStrategies[0]?.strategy?.shouldAutoSell,
+        autoSellDelayInMs: traderStrategies[0]?.strategy?.autoSellDelayInMs,
       });
 
       setFieldValue("traderId", traderStrategies[0]?.traderId);
@@ -117,6 +135,8 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
       setFieldValue("shouldCopyBuys", traderStrategies[0]?.strategy?.shouldCopyBuys);
       setFieldValue("shouldCopySells", traderStrategies[0]?.strategy?.shouldCopySells);
       setFieldValue("shouldEjectOnBuy", traderStrategies[0]?.strategy?.shouldEjectOnBuy);
+      setFieldValue("shouldAutoSell", traderStrategies[0]?.strategy?.shouldAutoSell);
+      setFieldValue("autoSellDelayInMs", traderStrategies[0]?.strategy?.autoSellDelayInMs);
       setFieldValue("priorityFee", traderStrategies[0]?.strategy?.priorityFee);
       setFieldValue("name", traderStrategies[0]?.strategy?.name);
       setFieldValue("shouldEjectOnCurve", traderStrategies[0]?.strategy?.shouldEjectOnCurve);
@@ -143,6 +163,7 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
       />
 
       <FormInputWithLabel
+        max={1}
         label="Intended Trade Ratio"
         name="intendedTradeRatio"
         type="number"
@@ -158,7 +179,7 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
         onChange={handleChange}
       />
 
-      <FormInputWithLabel
+      {/* <FormInputWithLabel
         label="Stop Loss (%)"
         name="stopLossPercentage"
         type="number"
@@ -172,20 +193,21 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
         type="number"
         value={values.takeProfitPercentage}
         onChange={handleChange}
-      />
+      /> */}
 
-      <FormInputWithLabel
+      {/* <FormInputWithLabel
         label="Priority Fee"
         name="priorityFee"
         type="number"
         value={values.priorityFee}
         onChange={handleChange}
-      />
+      /> */}
 
       <FormInputWithLabel
         label="Slippage (%)"
         name="slippagePercentage"
         type="number"
+        disabled
         value={values.slippagePercentage}
         onChange={handleChange}
       />
@@ -213,7 +235,7 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
               setFieldValue("shouldCopySells", e.target.checked);
             }}
             className="h-4 w-4 rounded border-gray-700 bg-sky-950 text-blue-600"
-            disabled={values.shouldEjectOnBuy}
+            disabled={values.shouldEjectOnBuy || values.shouldAutoSell}
           />
           <label className="ml-2 block text-sm text-gray-200">
             Copy Sells
@@ -226,9 +248,14 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
             checked={values.shouldEjectOnBuy}
             onChange={(e) => {
               setFieldValue("shouldEjectOnBuy", e.target.checked);
+              if (e.target.checked) {
+                setFieldValue("shouldEjectOnCurve", false);
+                setFieldValue("shouldCopySells", false);
+                setFieldValue("shouldAutoSell", false);
+              }
             }}
             className="h-4 w-4 rounded border-gray-700 bg-sky-950 text-blue-600"
-            disabled={values.shouldEjectOnCurve}
+            disabled={values.shouldEjectOnCurve || values.shouldAutoSell}
           />
           <label className="ml-2 block text-sm text-gray-200">
             Eject On Buy
@@ -236,6 +263,23 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
         </div>
 
         <div className="flex items-center">
+          <input
+            type="checkbox"
+            checked={values.shouldAutoSell}
+            onChange={(e) => {
+              setFieldValue("shouldAutoSell", e.target.checked);
+              setFieldValue("shouldCopySells", false);
+              setFieldValue("shouldEjectOnBuy", false);
+            }}
+            className="h-4 w-4 rounded border-gray-700 bg-sky-950 text-blue-600"
+            disabled={values.shouldEjectOnCurve || values.shouldEjectOnBuy}
+          />
+          <label className="ml-2 block text-sm text-gray-200">
+            Auto Sell
+          </label>
+        </div>
+
+        {/* <div className="flex items-center">
           <input
             type="checkbox"
             checked={values.shouldEjectOnCurve}
@@ -248,8 +292,18 @@ export const BotStrategyForm = ({ bot, refetch }: { bot: AuroraBot, refetch: () 
           <label className="ml-2 block text-sm text-gray-200">
             Eject On Curve
           </label>
-        </div>
+        </div> */}
       </div>
+
+      {values.shouldAutoSell && (
+        <FormInputWithLabel
+          label="Auto Sell Delay (ms)"
+          name="autoSellDelayInMs"
+          type="number"
+          value={values.autoSellDelayInMs}
+          onChange={handleChange}
+        />
+      )}
 
       <PrimaryButton
         disabled={isSubmitting}

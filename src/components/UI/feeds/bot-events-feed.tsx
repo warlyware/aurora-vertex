@@ -24,7 +24,6 @@ export const BotEventsFeed: React.FC<BotEventsFeedProps> = ({
   const { sendMessage, lastMessage, readyState } = useAuroraWebsocket();
 
   const {
-    BOT_TRADE_NOTIFICATION,
     BOT_LOG_EVENT,
     BOT_STATUS_UPDATE,
   } = messageTypes;
@@ -37,9 +36,6 @@ export const BotEventsFeed: React.FC<BotEventsFeedProps> = ({
       console.log('handleMessageData', type);
 
       switch (type) {
-        case BOT_TRADE_NOTIFICATION:
-          setBotLogs((prev) => [...prev, payload]);
-          break;
         case BOT_LOG_EVENT:
           setBotLogs((prev) => [...prev, payload]);
           break;

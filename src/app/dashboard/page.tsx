@@ -11,7 +11,7 @@ import { GET_BOTS_BY_USER_ID } from "@/graphql/queries/get-bots-by-user-id";
 import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
 import { useAuroraWebsocket } from "@/hooks/use-aurora-websocket";
 
-const { BOT_SPAWN, BOT_STOP, BOT_TRADE_NOTIFICATION, BOT_LOG_EVENT, BOT_STATUS_UPDATE } = messageTypes;
+const { BOT_SPAWN, BOT_STOP, BOT_LOG_EVENT, BOT_STATUS_UPDATE } = messageTypes;
 
 // Dynamic imports with ssr: false
 const ServerLogsFeed = dynamic(
@@ -57,9 +57,6 @@ export default function Dashboard() {
   const handleMessageData = useCallback(({ type, payload }: AuroraMessage) => {
     console.log("handleMessageData", { type, payload });
     switch (type) {
-      case BOT_TRADE_NOTIFICATION:
-        setBotLogs(prev => [...prev, payload]);
-        break;
       case BOT_LOG_EVENT:
         setBotLogs(prev => [...prev, payload]);
         break;
@@ -104,7 +101,11 @@ export default function Dashboard() {
   useEffect(() => {
     if (lastMessage) {
       try {
-        handleMessageData(JSON.parse(lastMessage.data));
+        if (typeof lastMessage.data === 'string') {
+          handleMessageData(JSON.parse(lastMessage.data));
+        } else {
+          handleMessageData(lastMessage.data);
+        }
       } catch (e) { }
     }
   }, [lastMessage, handleMessageData]);

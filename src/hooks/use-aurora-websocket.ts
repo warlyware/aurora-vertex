@@ -64,6 +64,10 @@ export const useAuroraWebsocket = () => {
   useEffect(() => {
     if (lastMessage !== null) {
       try {
+        if (lastMessage.data === 'reload') {
+          return;
+        }
+
         handleMessageData(JSON.parse(lastMessage.data));
       } catch (error) {
         console.error('Error parsing message data', error);

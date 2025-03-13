@@ -132,7 +132,6 @@ export function BotCard({
         strategy={bot?.activeTraderStrategyUnion?.strategy}
         trader={bot?.activeTraderStrategyUnion?.trader}
       />
-      <BotStatus status={botStatus} className="mb-4" />
       <hr className="my-4" />
       <form onSubmit={formik.handleSubmit}>
         <div className="flex py-2 space-x-2 items-end justify-between">
