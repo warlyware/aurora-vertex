@@ -33,10 +33,6 @@ export async function POST(req: NextRequest) {
   const url = `https://api.helius.xyz/v0/addresses/${address}/balances?api-key=${process.env.HELIUS_API_KEY}`;
 
   const { data } = await axios.get(url);
-  console.log({
-    url,
-    data,
-  });
 
   let {
     tokens: balances,

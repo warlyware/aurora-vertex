@@ -87,13 +87,13 @@ export default function WalletDetails(props: { params: Promise<any> }) {
           <div>{getAbbreviatedAddress(id)}</div>
           <CopyToClipboardButton text={id} />
           <button
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 font-bold hover:text-gray-700"
             onClick={handleSellAllTokens}
           >
             <BanknotesIcon className="w-4 h-4" />
           </button>
           <a
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 font-bold hover:text-gray-700"
             href={`https://gmgn.ai/sol/address/${id}`}
             target="_blank"
           >
