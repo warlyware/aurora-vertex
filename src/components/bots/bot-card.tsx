@@ -119,7 +119,7 @@ export function BotCard({
                 <EyeSlashIcon className="h-4 w-4" />
               )}
             </button> */}
-            <Link href={`/bot/${bot.id}`} target="_blank">
+            <Link href={`/bot/${bot.id}`}>
               <Cog6ToothIcon className="h-4 w-4" />
             </Link>
             <button onClick={() => onBotAction(bot.id)}>

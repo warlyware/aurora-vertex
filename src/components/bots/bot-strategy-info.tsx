@@ -13,7 +13,7 @@ export const BotStrategyInfo = ({ strategy, trader }: { strategy: BotStrategy | 
     <>
       <div className="flex text-sm gap-x-4 mb-4">
         <span>TARGET</span>
-        <a href={`https://gmgn.ai/sol/address/${trader.wallet.address}`} target="_blank">
+        <a href={`https://gmgn.ai/sol/address/${trader.wallet.address}`}>
           <span>{trader.name}</span> <span>({getAbbreviatedAddress(trader.wallet.address)})</span>
         </a>
       </div>
