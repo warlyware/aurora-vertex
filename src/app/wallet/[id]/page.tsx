@@ -54,7 +54,7 @@ export default function WalletDetails(props: { params: Promise<any> }) {
       primaryMessage: "Selling all tokens",
     });
     const { data } = await axios.post(
-      `${AURORA_VERTEX_API_URL}/sell-all-on-pumpfun`,
+      `${AURORA_VERTEX_API_URL}/sell-all-tokens`,
       {
         botId: bot?.id,
         apiKey: AURORA_VERTEX_FRONTEND_API_KEY,

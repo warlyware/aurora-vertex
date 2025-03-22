@@ -1,8 +1,9 @@
 'use client'
+import { BASE_URL } from "@/constants";
 import { getAbbreviatedAddress } from "@/utils";
 import ReactJson from "@microlink/react-json-view";
 import classNames from "classnames";
-
+import { useEffect } from "react";
 export type BotLogMessage = {
   botId?: string;
   message?: string;
@@ -26,6 +27,17 @@ export const BotMessage = (props: {
   const { message, index } = props;
 
 
+  const handlePlaySound = async () => {
+    const sound = new Audio(`${BASE_URL}/sounds/level-up.wav`);
+    sound.play();
+  };
+
+  useEffect(() => {
+    if (message?.meta?.shouldEjectOnBuy) {
+      handlePlaySound();
+    }
+  }, [message]);
+
 
   return (
     <div className="p-2 bg-black rounded-lg flex flex-col gap-y-2 bg-opacity-50 text-sm">
@@ -44,7 +56,7 @@ export const BotMessage = (props: {
       {message?.meta?.tokenMint && message?.meta?.sendSignature && (
         <div className="flex flex-col gap-y-4">
           <div className="text-gray-400 italic text-sm">
-            Ejected {message.meta.tokenAmount} of&nbsp;
+            Ejected &nbsp;
             <a href={`https://gmgn.ai/sol/token/${message.meta.tokenMint}`} target="_blank" rel="noopener noreferrer">
               {message.meta.tokenMint}
             </a>
@@ -63,6 +75,29 @@ export const BotMessage = (props: {
                 "text-purple-400": action.type === "SOL_TRANSFER"
               }])}>{action.type}</div>
               <div className="text-gray-400 italic text-sm">{action.description}</div>
+            </div>
+          ))}
+        </div>
+      }
+
+      {!!message?.meta?.links &&
+        <div className="flex flex-col gap-2 mb-2">
+          {Object.entries(message?.meta?.links).map(([category, links]) => (
+            <div key={category} className="flex gap-2 items-center">
+              <span className="text-gray-500 text-sm font-bold">{category}:</span>
+              <div className="flex gap-2">
+                {Object.entries(links as Record<string, string>).map(([platform, url]) => (
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    key={`${category}-${platform}`}
+                    className="text-gray-400 italic text-sm hover:text-gray-300"
+                  >
+                    {platform}
+                  </a>
+                ))}
+              </div>
             </div>
           ))}
         </div>

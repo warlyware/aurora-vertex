@@ -9,7 +9,7 @@ import { ReadyState } from "react-use-websocket";
 
 interface BotEventsFeedProps {
   visibleLogBotIds: string[];
-  onToggleVisibility?: (botId: string) => void;  // Make it optional if not always needed
+  onToggleVisibility?: (botId: string) => void;
 }
 
 export const BotEventsFeed: React.FC<BotEventsFeedProps> = ({

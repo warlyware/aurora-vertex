@@ -10,6 +10,7 @@ import { useQuery } from "@apollo/client";
 import { GET_BOTS_BY_USER_ID } from "@/graphql/queries/get-bots-by-user-id";
 import { AuroraMessage, messageTypes } from "@/types/websockets/messages";
 import { useAuroraWebsocket } from "@/hooks/use-aurora-websocket";
+import { BASE_URL } from "@/constants";
 
 const { BOT_SPAWN, BOT_STOP, BOT_LOG_EVENT, BOT_STATUS_UPDATE } = messageTypes;
 
@@ -98,6 +99,11 @@ export default function Dashboard() {
     [sendMessage]
   );
 
+  const testSound = useCallback(() => {
+    const sound = new Audio(`${BASE_URL}/sounds/level-up.wav`);
+    sound.play();
+  }, []);
+
   useEffect(() => {
     if (lastMessage) {
       try {
@@ -141,7 +147,17 @@ export default function Dashboard() {
                 <SolanaTxEventsFeed />
               </div>
               <div className="flex flex-col w-1/3 bg-black overflow-y-auto p-4">
-                <div className="text-lg gotu">Bot Activity</div>
+                <div className="gotu flex justify-between items-center">
+                  <div className="text-lg">
+                    Bot Activity
+                  </div>
+                  <button
+                    className="text-xs text-gray-400 underline"
+                    onClick={() => {
+                      testSound();
+                    }}>Test Sound</button>
+                </div>
+
                 <BotEventsFeed visibleLogBotIds={visibleLogBotIds} />
               </div>
             </div>

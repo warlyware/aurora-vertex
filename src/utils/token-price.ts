@@ -1,9 +1,10 @@
 import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
 import { getQuote } from "./quote";
+import { RPC_ENDPOINT } from "@/constants";
 
 export const getTokenPrice = async (tokenAddress: string) => {
 
-    const connection = new Connection(clusterApiUrl('mainnet-beta'), 'confirmed');
+    const connection = new Connection(RPC_ENDPOINT, 'confirmed');
 
     const mintInfo = await connection.getParsedAccountInfo(
         new PublicKey(tokenAddress)
