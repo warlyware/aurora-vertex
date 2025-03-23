@@ -48,6 +48,7 @@ export default function Dashboard() {
   const { loading } = useQuery(GET_BOTS_BY_USER_ID, {
     variables: { userId: user?.id },
     skip: !user?.id || typeof window === 'undefined',
+    fetchPolicy: 'no-cache',
     onCompleted: (data) => {
       setBots(data.bots);
       setVisibleLogBotIds(data.bots.map((bot: any) => bot.id));

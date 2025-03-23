@@ -39,6 +39,7 @@ export default function WalletDetails(props: { params: Promise<any> }) {
   const { data: botData, refetch } = useQuery(GET_BOT_BY_WALLET_ADDRESS, {
     variables: { address: id },
     skip: !id,
+    fetchPolicy: 'no-cache',
     onCompleted: (data) => {
       console.log(data);
       if (!data.bots.length) {

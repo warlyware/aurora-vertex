@@ -25,11 +25,13 @@ export const ServerLogsFeed = () => {
 
   const handleMessageData = useCallback(
     async ({ type, payload }: AuroraMessage) => {
+      console.log('ServerLogsFeed received message:', { type, payload });
 
       if (type === BOT_STATUS_UPDATE) return;
 
       switch (type) {
         case SERVER_LOG_EVENT:
+          console.log('Adding server log:', payload);
           setServerLogs((prev) => [...prev, { type, payload } as AuroraMessage]);
           break;
         default:
