@@ -19,6 +19,7 @@ enum MessageType {
   TG_CHAT_MESSAGE = "TG_CHAT_MESSAGE",
   TG_GET_CHATS = "TG_GET_CHATS",
   TG_GET_ME = "TG_GET_ME",
+  SOLANA_REFRESH_ACCOUNTS_TO_WATCH = "SOLANA_REFRESH_ACCOUNTS_TO_WATCH",
 }
 
 export const messageTypes = {
@@ -43,12 +44,24 @@ export const messageTypes = {
   TG_CHAT_MESSAGE: MessageType.TG_CHAT_MESSAGE,
   TG_GET_CHATS: MessageType.TG_GET_CHATS,
   TG_GET_ME: MessageType.TG_GET_ME,
+  SOLANA_REFRESH_ACCOUNTS_TO_WATCH: MessageType.SOLANA_REFRESH_ACCOUNTS_TO_WATCH,
 };
 
 export const messageGroups = {
-  SOLANA: Object.values(MessageType).filter(type => type.startsWith('SOLANA_')),
-  BOTS: Object.values(MessageType).filter(type => type.startsWith('BOT_')),
-  TELEGRAM: Object.values(MessageType).filter(type => type.startsWith('TG_')),
+  BOTS: [
+    MessageType.BOT_EVENT,
+    MessageType.BOT_LOG_EVENT,
+    MessageType.BOT_RESTART,
+    MessageType.BOT_SPAWN,
+    MessageType.BOT_STATUS_UPDATE,
+    MessageType.BOT_STOP,
+    MessageType.BOT_TRADE_NOTIFICATION,
+  ],
+  SOLANA: [
+    MessageType.SOLANA_TX_EVENT,
+    MessageType.SOLANA_TX_NOTIFICATION_FROM_HELIUS,
+    MessageType.SOLANA_REFRESH_ACCOUNTS_TO_WATCH,
+  ],
 };
 
 export type AuroraMessage = {

@@ -4,6 +4,11 @@ import { ADD_WALLET } from "@/graphql/mutations/add-wallet";
 import { GET_TRADER_BY_ADDRESS } from "@/graphql/queries/get-trader-by-address";
 import { GET_WALLET_BY_ADDRESS } from "@/graphql/queries/get-wallet-by-address";
 import { NextRequest, NextResponse } from "next/server";
+import { messageTypes } from "@/types/websockets/messages";
+import { AURORA_VERTEX_WS_URL, AURORA_VERTEX_FRONTEND_API_KEY } from "@/constants";
+import WebSocket from "ws";
+
+const { SOLANA_REFRESH_ACCOUNTS_TO_WATCH } = messageTypes;
 
 export async function POST(req: NextRequest) {
   const { address, name }: { address: string, name: string } = await req?.json();
@@ -90,6 +95,15 @@ export async function POST(req: NextRequest) {
   });
 
   console.log({ insert_traders_one });
+
+  // Send message to WebSocket server to refresh accounts
+  const ws = new WebSocket(`${AURORA_VERTEX_WS_URL}/?auth=${AURORA_VERTEX_FRONTEND_API_KEY}&userId=SYSTEM`);
+  ws.on('open', () => {
+    ws.send(JSON.stringify({
+      type: SOLANA_REFRESH_ACCOUNTS_TO_WATCH,
+    }));
+    ws.close();
+  });
 
   return NextResponse.json({
     status: 200,
