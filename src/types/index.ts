@@ -47,6 +47,7 @@ export interface Trader {
   id: string;
   name: string;
   createdAt: string;
+  description?: string;
   wallet: {
     id: string;
     address: string;

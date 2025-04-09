@@ -10,6 +10,7 @@ export const GET_TRADERS = gql`
         id
         address
       }
+      description
     }
   }
 `;

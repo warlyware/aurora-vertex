@@ -15,6 +15,7 @@ export default function AddTraderForm({ refetch, className }: AddTraderFormProps
     initialValues: {
       address: "",
       name: "",
+      description: "",
     },
     onSubmit: async (values) => {
       console.log(values);
@@ -22,6 +23,7 @@ export default function AddTraderForm({ refetch, className }: AddTraderFormProps
       const { data, status } = await axios.post(`${BASE_URL}/api/add-trader`, {
         address: values.address,
         name: values.name,
+        description: values.description,
       });
 
       if (status === 200) {
@@ -50,6 +52,12 @@ export default function AddTraderForm({ refetch, className }: AddTraderFormProps
         label="Address"
         name="address"
         value={values.address}
+        onChange={handleChange}
+      />
+      <FormInputWithLabel
+        label="Description"
+        name="description"
+        value={values.description}
         onChange={handleChange}
       />
       <PrimaryButton

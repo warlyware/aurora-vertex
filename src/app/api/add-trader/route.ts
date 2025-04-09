@@ -11,7 +11,15 @@ import WebSocket from "ws";
 const { SOLANA_REFRESH_ACCOUNTS_TO_WATCH } = messageTypes;
 
 export async function POST(req: NextRequest) {
-  const { address, name }: { address: string, name: string } = await req?.json();
+  const {
+    address,
+    name,
+    description,
+  }: {
+    address: string;
+    name: string;
+    description: string;
+  } = await req?.json();
 
   if (!address) {
     return NextResponse.json({
@@ -90,6 +98,7 @@ export async function POST(req: NextRequest) {
       trader: {
         walletId,
         name,
+        description,
       }
     },
   });
